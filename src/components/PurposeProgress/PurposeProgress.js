@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Card, CardContent, Typography, makeStyles, LinearProgress } from '@material-ui/core'
+import { Card, CardContent, Typography, makeStyles, LinearProgress, CardHeader } from '@material-ui/core'
 import styles from './styles'
 
 const useStyles = makeStyles(styles)
@@ -17,6 +17,9 @@ const PurposeProgress = ({purposeCurrent = 0, purposeTotal = 0, currency = '₽'
 
   return (
     <Card className={classes.root}>
+      <CardHeader
+        title="Прогресс цели"
+      />
       <CardContent>
         <div className={classes.purposeProgressInfo}>
           <div className={classes.purposeNumbers}>
@@ -27,7 +30,7 @@ const PurposeProgress = ({purposeCurrent = 0, purposeTotal = 0, currency = '₽'
           <Typography variant="h3" component="span" className={classes.currency}>{currency}</Typography>
           </div>
         </div>
-        <span className={classes.purposeProgressCaption}>Прогресс цели</span>
+        {/* <span className={classes.purposeProgressCaption}></span> */}
         <LinearProgress 
           className={classes.progressBar} 
           variant="determinate" 
