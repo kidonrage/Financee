@@ -30,6 +30,10 @@ export default (theme) => ({
     flexShrink: 0,
     whiteSpace: 'nowrap',
   },
+  drawerContent: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
   drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create('width', {
@@ -44,9 +48,6 @@ export default (theme) => ({
     }),
     overflowX: 'hidden',
     width: theme.spacing(7) + 1,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9) + 1,
-    },
   },
   toolbar: {
     display: 'flex',
@@ -55,6 +56,11 @@ export default (theme) => ({
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
+  },
+  sidebarBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'space-between'
   },
   content: {
     flexGrow: 1,

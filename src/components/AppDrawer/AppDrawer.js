@@ -8,12 +8,11 @@ import Divider from '@material-ui/core/Divider'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import InboxIcon from '@material-ui/icons/MoveToInbox'
-import MailIcon from '@material-ui/icons/Mail'
 import MenuCloseIcon from '@material-ui/icons/MenuOpen';
 import MenuOpenIcon from '@material-ui/icons/Menu';
 import styles from './styles'
 import TopBar from '../TopBar'
+import NavList from '../NavList/NavList'
 
 const useStyles = makeStyles(styles)
 
@@ -36,32 +35,29 @@ const AppDrawer = ({children}) => {
           [classes.drawerClose]: !open,
         })}
         classes={{
-          paper: clsx({
+          paper: clsx(classes.drawerContent, {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
           }),
         }}
       >
-        <div className={classes.toolbar} />
-        <Divider />
-        <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
+        <div>
+          <div className={classes.toolbar} />
+          <Divider />
+          <NavList />
+        </div>
+        <div>
+          <Divider />
+          <List>
+            <ListItem 
+              button
+              onClick={handleDrawerToggle}
+            >
+              <ListItemIcon>{open ? <MenuCloseIcon /> : <MenuOpenIcon />}</ListItemIcon>
+              <ListItemText primary={open ? "Свернуть" : "Развернуть"} />
             </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          <ListItem 
-            button
-            onClick={handleDrawerToggle}
-          >
-            <ListItemIcon>{open ? <MenuCloseIcon /> : <MenuOpenIcon />}</ListItemIcon>
-            <ListItemText primary={open ? "Свернуть" : "Развернуть"} />
-          </ListItem>
-        </List>
+          </List>
+        </div>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
