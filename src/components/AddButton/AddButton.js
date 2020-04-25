@@ -31,7 +31,7 @@ function AddButton() {
           </Fab>
         </Zoom>
         <Zoom in={open}>
-          <Fab color="primary" aria-label="add expense" className={clsx(classes.actionButton, classes.addExpense)}>
+          <Fab color="secondary" aria-label="add expense" className={clsx(classes.actionButton, classes.addExpense)}>
             <RemoveIcon />
           </Fab>
         </Zoom>

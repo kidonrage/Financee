@@ -1,4 +1,4 @@
-import { green } from '@material-ui/core/colors';
+import { green, red } from '@material-ui/core/colors';
 import { createMuiTheme } from '@material-ui/core/styles';
 
 const theme = createMuiTheme()
@@ -9,7 +9,7 @@ export default createMuiTheme({
       main: green[600],
     },
     secondary: {
-      main: '#11cb5f',
+      main: red[500],
     },
   },
   typography: {
