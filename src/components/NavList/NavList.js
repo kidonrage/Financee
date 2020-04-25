@@ -3,7 +3,7 @@ import { List, ListItem, ListItemIcon, ListItemText, Icon } from '@material-ui/c
 import navConfig from './navConfig'
 import { useHistory } from 'react-router-dom'
 
-const NavList = () => {
+const NavList = ({onClick = () => {}}) => {
   const history = useHistory()
   
   return (
@@ -12,7 +12,10 @@ const NavList = () => {
         <ListItem 
           button 
           key={index}
-          onClick={() => history.push(navItem.href)}
+          onClick={() => {
+            history.push(navItem.href)
+            onClick()
+          }}
         >
           <ListItemIcon>
             <Icon component={navItem.icon} />

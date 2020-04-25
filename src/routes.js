@@ -12,7 +12,7 @@ export default [
     component: AppLayout,
     routes: [
       {
-        path: '/dashboard',
+        path: '/',
         exact: true,
         component: lazy(() => import('./views/Dashboard'))
       },

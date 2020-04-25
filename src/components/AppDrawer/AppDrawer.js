@@ -79,7 +79,7 @@ const AppDrawer = ({children}) => {
           onOpen={() => setOpen(true)}
         >
           <div className={classes.drawerOpen}>
-            <NavList />
+            <NavList onClick={() => setOpen(false)} />
           </div>
         </SwipeableDrawer>
       </Hidden>
