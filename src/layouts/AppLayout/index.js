@@ -1,7 +1,8 @@
 import React from 'react'
-import AppDrawer from '../../components/AppDrawer'
 import { renderRoutes } from 'react-router-config'
 import { Container } from '@material-ui/core'
+import AppDrawer from '../../components/AppDrawer'
+import AddButton from '../../components/AddButton'
 
 const AppLayout = ({ route }) => {
   return (
@@ -9,6 +10,7 @@ const AppLayout = ({ route }) => {
       <Container maxWidth="lg">
         {renderRoutes(route.routes)}
       </Container>
+      <AddButton />
     </AppDrawer>
   )
 }
