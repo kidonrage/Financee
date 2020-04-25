@@ -64,12 +64,13 @@ export default (theme) => ({
   },
   contentWrapper: {
     marginTop: theme.spacing(7),
+    maxWidth: '100%',
     flexGrow: 1,
     [theme.breakpoints.up('sm')]: {
       marginTop: theme.spacing(8)
     }
   },
   content: {
-    padding: theme.spacing(3),
+    paddingTop: theme.spacing(3),
   },
 })

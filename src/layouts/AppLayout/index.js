@@ -1,11 +1,14 @@
-import React, {Suspense} from 'react'
+import React from 'react'
 import AppDrawer from '../../components/AppDrawer'
 import { renderRoutes } from 'react-router-config'
+import { Container } from '@material-ui/core'
 
 const AppLayout = ({ route }) => {
   return (
     <AppDrawer>
-      {renderRoutes(route.routes)}
+      <Container maxWidth="lg">
+        {renderRoutes(route.routes)}
+      </Container>
     </AppDrawer>
   )
 }
