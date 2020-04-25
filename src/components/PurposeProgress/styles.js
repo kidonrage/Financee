@@ -1,7 +1,4 @@
 export default theme => ({
-  root: {
-    padding: theme.spacing(2)
-  },
   purposeProgressInfo: {
     display: 'flex',
     alignItems: 'center',

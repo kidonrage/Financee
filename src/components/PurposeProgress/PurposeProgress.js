@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Card, Typography, makeStyles, LinearProgress } from '@material-ui/core'
+import { Card, CardContent, Typography, makeStyles, LinearProgress } from '@material-ui/core'
 import styles from './styles'
 
 const useStyles = makeStyles(styles)
@@ -17,21 +17,23 @@ const PurposeProgress = ({purposeCurrent = 0, purposeTotal = 0, currency = '₽'
 
   return (
     <Card className={classes.root}>
-      <div className={classes.purposeProgressInfo}>
-        <div className={classes.purposeNumbers}>
-          <Typography variant="h3" component="span" className={classes.purposeCurrent}>{purposeCurrent}/</Typography>
-          <Typography variant="h5" component="span" className={classes.purposeTotal}>{purposeTotal}</Typography>
+      <CardContent>
+        <div className={classes.purposeProgressInfo}>
+          <div className={classes.purposeNumbers}>
+            <Typography variant="h3" component="span" className={classes.purposeCurrent}>{purposeCurrent}/</Typography>
+            <Typography variant="h5" component="span" className={classes.purposeTotal}>{purposeTotal}</Typography>
+          </div>
+          <div>
+          <Typography variant="h3" component="span" className={classes.currency}>{currency}</Typography>
+          </div>
         </div>
-        <div>
-        <Typography variant="h3" component="span" className={classes.currency}>{currency}</Typography>
-        </div>
-      </div>
-      <span className={classes.purposeProgressCaption}>Прогресс цели</span>
-      <LinearProgress 
-        className={classes.progressBar} 
-        variant="determinate" 
-        value={progressValue} 
-      />
+        <span className={classes.purposeProgressCaption}>Прогресс цели</span>
+        <LinearProgress 
+          className={classes.progressBar} 
+          variant="determinate" 
+          value={progressValue} 
+        />
+      </CardContent>
     </Card>
   )
 }
