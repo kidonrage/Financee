@@ -87,7 +87,6 @@ const AppDrawer = ({children}) => {
       <div className={classes.contentWrapper}>
         <Suspense fallback={<LinearProgress />}>
           <main className={classes.content}>
-            <div className={classes.toolbar} />
             {children}
           </main>
         </Suspense>
