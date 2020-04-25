@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {Suspense} from 'react'
 import AppDrawer from '../../components/AppDrawer'
+import { renderRoutes } from 'react-router-config'
 
-const AppLayout = () => {
+const AppLayout = ({ route }) => {
   return (
     <AppDrawer>
-      <h1>Hello Financee</h1>
+      {renderRoutes(route.routes)}
     </AppDrawer>
   )
 }

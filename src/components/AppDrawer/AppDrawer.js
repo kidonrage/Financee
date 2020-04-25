@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Suspense} from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import {
@@ -10,7 +10,8 @@ import {
   Divider,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  LinearProgress
 } from '@material-ui/core'
 import MenuCloseIcon from '@material-ui/icons/MenuOpen';
 import MenuOpenIcon from '@material-ui/icons/Menu';
@@ -83,10 +84,14 @@ const AppDrawer = ({children}) => {
         </SwipeableDrawer>
       </Hidden>
       
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        {children}
-      </main>
+      <div className={classes.contentWrapper}>
+        <Suspense fallback={<LinearProgress />}>
+          <main className={classes.content}>
+            <div className={classes.toolbar} />
+            {children}
+          </main>
+        </Suspense>
+      </div>
     </div>
   )
 }

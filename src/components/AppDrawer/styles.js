@@ -62,8 +62,14 @@ export default (theme) => ({
     flexDirection: 'column',
     alignItems: 'space-between'
   },
-  content: {
+  contentWrapper: {
+    marginTop: theme.spacing(7),
     flexGrow: 1,
+    [theme.breakpoints.up('sm')]: {
+      marginTop: theme.spacing(8)
+    }
+  },
+  content: {
     padding: theme.spacing(3),
   },
 })

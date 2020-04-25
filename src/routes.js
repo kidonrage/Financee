@@ -15,7 +15,22 @@ export default [
         path: '/dashboard',
         exact: true,
         component: lazy(() => import('./views/Dashboard'))
-      }
+      },
+      {
+        path: '/expenses',
+        exact: true,
+        component: lazy(() => import('./views/Expenses'))
+      },
+      {
+        path: '/income',
+        exact: true,
+        component: lazy(() => import('./views/Income'))
+      },
+      {
+        path: '/profile',
+        exact: true,
+        component: lazy(() => import('./views/Profile'))
+      },
     ]
   }
 ]
