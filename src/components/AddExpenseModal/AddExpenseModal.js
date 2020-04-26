@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
-import NumberFormat from 'react-number-format'
 import {
   Button,
-  InputLabel,
-  MenuItem,
   Dialog,
   DialogActions,
   DialogContent,
-  Select,
   DialogContentText,
   DialogTitle,
   TextField,
@@ -16,29 +12,8 @@ import {
   useTheme,
   makeStyles
 } from '@material-ui/core'
+import AmountFormat from '../AmountFormat'
 import styles from './styles'
-
-function NumberFormatCustom(props) {
-  const { inputRef, onChange, ...other } = props
-
-  return (
-    <NumberFormat
-      {...other}
-      getInputRef={inputRef}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          },
-        })
-      }}
-      thousandSeparator=" "
-      isNumericString
-      suffix=" ₽"
-    />
-  )
-}
 
 const useStyles = makeStyles(styles)
 
@@ -83,7 +58,7 @@ const AddExpenseModal = ({open, handleClose}) => {
               variant="outlined"
               id="formatted-incomeAmount-input"
               InputProps={{
-                inputComponent: NumberFormatCustom,
+                inputComponent: AmountFormat,
               }}
             />
           </FormControl>

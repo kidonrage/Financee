@@ -6,6 +6,17 @@ export default theme => ({
     width: '100%',
     marginBottom: theme.spacing(2),
   },
+  addIncomeSource: {
+    marginLeft: 0,
+    cursor: 'pointer',
+    color: theme.palette.primary.main,
+    opacity: 0.75,
+
+    '&:hover': {
+      textDecoration: 'underline',
+      opacity: 1,
+    }
+  }
   // incomeAmount: {
   //   width: '100%'
   // },
