@@ -7,6 +7,7 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import styles from './styles'
 import clsx from 'clsx'
 import AddIncomeModal from '../AddIncomeModal';
+import AddExpenseModal from '../AddExpenseModal';
 
 const useStyles = makeStyles(styles)
 
@@ -58,6 +59,10 @@ function AddButton() {
       <AddIncomeModal 
         open={addIncomeModalOpen}
         handleClose={() => setAddIncomeModalOpen(false)}
+      />
+      <AddExpenseModal 
+        open={addExpenseModalOpen}
+        handleClose={() => setAddExpenseModalOpen(false)}
       />
     </>
   )

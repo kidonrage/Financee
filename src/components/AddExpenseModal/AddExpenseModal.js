@@ -42,7 +42,7 @@ function NumberFormatCustom(props) {
 
 const useStyles = makeStyles(styles)
 
-const AddIncomeModal = ({open, handleClose}) => {
+const AddExpenseModal = ({open, handleClose}) => {
   const classes = useStyles()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -66,10 +66,12 @@ const AddIncomeModal = ({open, handleClose}) => {
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
-      <DialogTitle id="responsive-dialog-title">Добавить новый доход</DialogTitle>
+      <DialogTitle id="responsive-dialog-title">Добавить новый расход</DialogTitle>
       <DialogContent>
 
-        <DialogContentText className={classes.formCaption}>Выберите источник дохода, введите сумму и нажмите кнопку "Добавить"</DialogContentText>
+        <DialogContentText className={classes.formCaption}>Введите сумму расхода и нажмите кнопку "Добавить"</DialogContentText>
+        <DialogContentText className={classes.formCaption}><b>Свободных средств: 30000₽</b></DialogContentText>
+        
 
         <FormControl className={classes.formControl}>
             <TextField
@@ -86,22 +88,6 @@ const AddIncomeModal = ({open, handleClose}) => {
             />
           </FormControl>
 
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="incomeSourceLabel">Источник дохода</InputLabel>
-            <Select 
-              className={classes.incomeSource}
-              labelId="incomeSourceLabel" 
-              id="incomeSource" 
-              name="incomeSource"
-              value={values.incomeSource}
-              onChange={handleChange}
-              label="Источник дохода"
-            >
-              <MenuItem value="Источник 1">Источник 1</MenuItem>
-              <MenuItem value="Источник 2">Источник 2</MenuItem>
-            </Select>
-          </FormControl>
-
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleClose} color="secondary">
@@ -115,4 +101,4 @@ const AddIncomeModal = ({open, handleClose}) => {
   )
 }
 
-export default AddIncomeModal
+export default AddExpenseModal
