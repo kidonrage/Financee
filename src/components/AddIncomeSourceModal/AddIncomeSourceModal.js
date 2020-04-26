@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   Dialog,
@@ -16,8 +16,10 @@ import {
   makeStyles
 } from '@material-ui/core'
 import { BlockPicker } from 'react-color'
+import { getContrastingColor } from 'react-color/lib/helpers'
 import styles from './styles'
 import clsx from 'clsx'
+import { getRandomColors } from '../../utils/colors'
 
 const useStyles = makeStyles(styles)
 
@@ -27,6 +29,7 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [pickerAnchor, setPickerAnchor] = React.useState(null);
+  const [pickerColors, setPickerColors] = React.useState([]);
   const [values, setValues] = useState({
     sourceName: '',
     color: '#000'
@@ -56,10 +59,21 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
     setPickerAnchor(null);
   };
 
+  useEffect(() => {
+    getRandomColors()
+      .then(colors => {
+        setPickerColors(colors)
+        setValues({
+          sourceName: '',
+          color: colors[0]
+        })
+      })
+  }, [])
+
   return (
     <Dialog
       fullScreen={fullScreen}
-      open={true}
+      open={open}
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
@@ -86,7 +100,10 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
           <Chip 
             size="small" 
             className={classes.colorInput} 
-            style={{backgroundColor: values.color}}
+            style={{
+              backgroundColor: values.color,
+              color: getContrastingColor(values.color)
+            }}
             onClick={handlePickerOpen}
             label={values.sourceName}
           />
@@ -110,6 +127,7 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
               color={ values.color }
               onChangeComplete={ handleColorChange }
               onChange={ handleColorChange }
+              colors={pickerColors}
             />
           </Popover>
         </FormControl>        
