@@ -5,7 +5,14 @@ import AuthLayout from './layouts/AuthLayout'
 export default [
   {
     path: '/auth',
-    component: AuthLayout
+    component: AuthLayout,
+    routes: [
+      {
+        path: '/auth/login',
+        exact: true,
+        component: lazy(() => import('./views/Login'))
+      },
+    ]
   },
   {
     route: '*',
