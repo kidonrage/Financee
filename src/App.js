@@ -1,21 +1,23 @@
-import React, {Suspense} from 'react'
+import React from 'react'
 import { Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/styles'
-import { LinearProgress } from '@material-ui/core';
+import AuthProvider from './components/Auth'
 import history from './utils/history'
 import routes from './routes'
 import theme from './theme'
 
 function App() {
   return (
-    <Router history={history}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <ThemeProvider theme={theme}>
-        {renderRoutes(routes)}
-      </ThemeProvider>
-    </Router>
+      <AuthProvider>
+        <Router history={history}>
+          {renderRoutes(routes)}
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

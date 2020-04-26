@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useCallback} from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import styles from './styles'
+import firebase from '../../utils/firebase'
+import { useHistory } from 'react-router-dom'
 
 function Copyright() {
   return (
@@ -31,6 +33,20 @@ const useStyles = makeStyles(styles)
 
 export default function Registration() {
   const classes = useStyles()
+  const history = useHistory()
+
+  const handleSignUp = useCallback(async (event) => {
+    event.preventDefault()
+
+    const {name, email, password} = event.target.elements
+
+    try {
+      await firebase.register(name.value, email.value, password.value)
+      history.push('/')
+    } catch (e) {
+      alert(e)
+    }
+  }, [history])
 
   return (
     <Container component="main" maxWidth="xs">
@@ -42,8 +58,8 @@ export default function Registration() {
         <Typography component="h1" variant="h5">
           Регистрация
         </Typography>
-        <form className={classes.form} noValidate>
-        <TextField
+        <form className={classes.form} onSubmit={handleSignUp}>
+          <TextField
             variant="outlined"
             margin="normal"
             required

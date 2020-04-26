@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import {useHistory} from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -14,11 +15,41 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import styles from './styles'
 import Copyright from '../../components/Copyright'
+import firebase from '../../utils/firebase'
 
 const useStyles = makeStyles(styles)
 
 export default function SignIn() {
   const classes = useStyles()
+  const history = useHistory()
+
+  const [values, setValues] = useState({
+    email: '',
+    password: ''
+  })
+
+  const handleLogin = async () => {
+    const {email, password} = values
+
+    try {
+      firebase.login(email, password)
+      history.push('/')
+    } catch (e) {
+      alert(e.message)
+    }
+  }
+
+  const handleChange = (e) => {
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value
+    })
+  } 
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    handleLogin()
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -30,7 +61,10 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Вход
         </Typography>
-        <form className={classes.form} noValidate>
+        <form 
+          className={classes.form} 
+          onSubmit={handleSubmit}
+        >
           <TextField
             variant="outlined"
             margin="normal"
@@ -41,6 +75,8 @@ export default function SignIn() {
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={handleChange}
+            value={values.email}
           />
           <TextField
             variant="outlined"
@@ -52,6 +88,8 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={handleChange}
+            value={values.password}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
