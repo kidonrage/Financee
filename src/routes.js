@@ -12,6 +12,11 @@ export default [
         exact: true,
         component: lazy(() => import('./views/Login'))
       },
+      {
+        path: '/auth/registration',
+        exact: true,
+        component: lazy(() => import('./views/Registration'))
+      },
     ]
   },
   {

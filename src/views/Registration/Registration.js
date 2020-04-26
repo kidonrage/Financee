@@ -13,11 +13,23 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import styles from './styles'
-import Copyright from '../../components/Copyright'
+
+function Copyright() {
+  return (
+    <Typography variant="body2" color="textSecondary" align="center">
+      {'Copyright © '}
+      <Link color="inherit" href="/">
+        Financee
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  )
+}
 
 const useStyles = makeStyles(styles)
 
-export default function SignIn() {
+export default function Registration() {
   const classes = useStyles()
 
   return (
@@ -28,9 +40,20 @@ export default function SignIn() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Вход
+          Регистрация
         </Typography>
         <form className={classes.form} noValidate>
+        <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="name"
+            label="Имя"
+            name="name"
+            autoComplete="name"
+            autoFocus
+          />
           <TextField
             variant="outlined"
             margin="normal"
@@ -55,7 +78,7 @@ export default function SignIn() {
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
-            label="Запомнить меня"
+            label="Я согласен"
           />
           <Button
             type="submit"
@@ -64,17 +87,12 @@ export default function SignIn() {
             color="primary"
             className={classes.submit}
           >
-            Войти
+            Зарегистрироваться
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="/auth/password_reset" variant="body2">
-                Забыли пароль?
-              </Link>
-            </Grid>
+          <Grid container justify="center">
             <Grid item>
-              <Link href="/auth/registration" variant="body2">
-                Нет аккаунта?
+              <Link href="/auth/login" variant="body2">
+                Уже есть аккаунт?
               </Link>
             </Grid>
           </Grid>
