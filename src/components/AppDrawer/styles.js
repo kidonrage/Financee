@@ -71,6 +71,6 @@ export default (theme) => ({
     }
   },
   content: {
-    paddingTop: theme.spacing(3),
+    paddingTop: theme.spacing(5),
   },
 })
