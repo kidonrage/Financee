@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   Button,
   Dialog,
@@ -15,11 +15,13 @@ import {
   useTheme,
   makeStyles
 } from '@material-ui/core'
+import clsx from 'clsx'
 import { BlockPicker } from 'react-color'
 import { getContrastingColor } from 'react-color/lib/helpers'
 import styles from './styles'
-import clsx from 'clsx'
+import firebase from '../../utils/firebase'
 import { getRandomColors } from '../../utils/colors'
+import { AuthContext } from '../Auth'
 
 const useStyles = makeStyles(styles)
 
@@ -27,6 +29,7 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
   const classes = useStyles()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const {currentUser} = useContext(AuthContext)
 
   const [pickerAnchor, setPickerAnchor] = React.useState(null);
   const [pickerColors, setPickerColors] = React.useState([]);
@@ -58,6 +61,28 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
   const handlePickerClose = () => {
     setPickerAnchor(null);
   };
+
+  const handleAdd = () => {
+    const {sourceName, color} = values
+
+    console.log(currentUser.uid)
+
+    const userDocRef = firebase.db.collection(`users`).doc('0')
+    userDocRef.collection('incomeSources')
+    .add({
+      name: sourceName,
+      color
+    })
+    .catch(error => {
+      if (error.code === 'permission-denied') {
+        alert("Permission denied!")
+        return
+      }
+
+      console.error("Error!")
+    })
+    .finally(() => handleClose())
+  }
 
   useEffect(() => {
     getRandomColors()
@@ -137,7 +162,7 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
         <Button autoFocus onClick={handleClose} color="secondary">
           Отмена
         </Button>
-        <Button onClick={handleClose} color="primary" autoFocus>
+        <Button onClick={handleAdd} color="primary" autoFocus>
           Добавить
         </Button>
       </DialogActions>

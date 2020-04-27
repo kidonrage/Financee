@@ -1,8 +1,10 @@
 import React from 'react'
+import IncomesTable from '../../components/IncomesTable'
 
 const Income = () => {
   return (
-    <h1>Hello Financee Income!</h1>
+    // <IncomesTable />
+    <></>
   )
 }
 
