@@ -1,3 +1,4 @@
+import firebase from 'firebase'
 import app from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firebase-firestore'
@@ -32,6 +33,33 @@ class Firebase {
     return this.auth.currentUser.updateProfile({
       displayName: name
     })
+  }
+
+  addIncomeSource(name, color) {
+    const {uid} = this.auth.currentUser
+    
+    const userIncomeSourcesRef = this.db.collection(`incomeSources`).doc(uid)
+    return userIncomeSourcesRef.set({
+      sources: firebase.firestore.FieldValue.arrayUnion({
+        name,
+        color
+      })
+    }, {merge: true})
+  }
+
+  getIncomeSources() {
+    const {uid} = this.auth.currentUser
+
+    return this.db.collection(`incomeSources`).doc(uid).get()
+      .then(doc => {
+        if (doc.exists) {
+          const {sources} = doc.data()
+
+          return sources && sources.length ? sources : []
+        } else {
+          return []
+        }
+      })
   }
 }
 

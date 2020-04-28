@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
   Button,
   Dialog,
@@ -21,20 +21,18 @@ import { getContrastingColor } from 'react-color/lib/helpers'
 import styles from './styles'
 import firebase from '../../utils/firebase'
 import { getRandomColors } from '../../utils/colors'
-import { AuthContext } from '../Auth'
 
 const useStyles = makeStyles(styles)
 
-const AddIncomeSourceModal = ({open, handleClose}) => {
+const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
   const classes = useStyles()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-  const {currentUser} = useContext(AuthContext)
 
   const [pickerAnchor, setPickerAnchor] = React.useState(null);
   const [pickerColors, setPickerColors] = React.useState([]);
   const [values, setValues] = useState({
-    sourceName: '',
+    name: '',
     color: '#000'
   })
 
@@ -63,33 +61,34 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
   };
 
   const handleAdd = () => {
-    const {sourceName, color} = values
+    const {name, color} = values
 
-    console.log(currentUser.uid)
+    firebase.addIncomeSource(name, color)
+      .then(() => {
+        onAdd({
+          name, 
+          color
+        })
+      })
+      .catch(error => {
+        if (error.code === 'permission-denied') {
+          alert("Permission denied!")
+          return
+        }
 
-    const userDocRef = firebase.db.collection(`users`).doc('0')
-    userDocRef.collection('incomeSources')
-    .add({
-      name: sourceName,
-      color
-    })
-    .catch(error => {
-      if (error.code === 'permission-denied') {
-        alert("Permission denied!")
-        return
-      }
-
-      console.error("Error!")
-    })
-    .finally(() => handleClose())
+        console.error("Error!", JSON.stringify(error))
+      })
+      .finally(() => {
+        handleClose()
+      })
   }
 
-  useEffect(() => {
+  const handleOpenModal = useCallback(() => {
     getRandomColors()
       .then(colors => {
         setPickerColors(colors)
         setValues({
-          sourceName: '',
+          name: '',
           color: colors[0]
         })
       })
@@ -101,6 +100,7 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
       open={open}
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
+      onEnter={handleOpenModal}
     >
       <DialogTitle id="responsive-dialog-title">Добавить новый источник дохода</DialogTitle>
       <DialogContent>
@@ -109,11 +109,10 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
 
         <FormControl className={classes.formControl}>
           <TextField
-            className={classes.sourceName}
             label="Название"
-            value={values.sourceName}
+            value={values.name}
             onChange={handleChange}
-            name="sourceName"
+            name="name"
             variant="outlined"
           />
         </FormControl>
@@ -130,7 +129,7 @@ const AddIncomeSourceModal = ({open, handleClose}) => {
               color: getContrastingColor(values.color)
             }}
             onClick={handlePickerOpen}
-            label={values.sourceName}
+            label={values.name}
           />
           <Popover 
             open={pickerOpen}

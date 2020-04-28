@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import NumberFormat from 'react-number-format'
 import {
   Button,
@@ -17,6 +17,7 @@ import {
   useTheme,
   makeStyles
 } from '@material-ui/core'
+import firebase from '../../utils/firebase'
 import styles from './styles'
 import AmountFormat from '../AmountFormat'
 import AddIncomeSourceModal from '../AddIncomeSourceModal'
@@ -29,7 +30,7 @@ const AddIncomeModal = ({open, handleClose}) => {
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [incomeSourceModalOpen, setIncomeSourceModalOpen] = useState(false)
-
+  const [incomeSources, setIncomeSources] = useState([])
   const [values, setValues] = useState({
     incomeSource: '',
     incomeAmount: '0',
@@ -41,6 +42,11 @@ const AddIncomeModal = ({open, handleClose}) => {
       [event.target.name]: event.target.value,
     })
   }
+
+  useEffect(() => {
+    firebase.getIncomeSources()
+      .then(setIncomeSources)
+  }, [])
 
   return (
     <>
@@ -80,9 +86,9 @@ const AddIncomeModal = ({open, handleClose}) => {
                 value={values.incomeSource}
                 onChange={handleChange}
                 label="Источник дохода"
+                disabled={!incomeSources.length}
               >
-                <MenuItem value="Источник 1">Источник 1</MenuItem>
-                <MenuItem value="Источник 2">Источник 2</MenuItem>
+                {incomeSources.map((source, idx) => <MenuItem key={idx} value={JSON.stringify(source)}>{source.name}</MenuItem>)}
               </Select>
               <FormHelperText 
                 className={classes.addIncomeSource}
@@ -105,6 +111,16 @@ const AddIncomeModal = ({open, handleClose}) => {
       <AddIncomeSourceModal 
         open={incomeSourceModalOpen}
         handleClose={() => setIncomeSourceModalOpen(false)}
+        onAdd={(newIncomeSource) => {
+          setIncomeSources([
+            ...incomeSources,
+            newIncomeSource
+          ])
+          setValues({
+            ...values,
+            incomeSource: JSON.stringify(newIncomeSource)
+          })
+        }}
       />
     </>
   )
