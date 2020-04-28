@@ -61,6 +61,18 @@ class Firebase {
         }
       })
   }
+
+  addIncome(amount, source) {
+    const {uid} = this.auth.currentUser
+    
+    return this.db.collection(`incomes/${uid}/items`).add({
+      amount: parseInt(amount, 10),
+      source: source
+    })
+    .catch(error => {
+      alert("Не удалось добавить доход")
+    })
+  }
 }
 
 export default new Firebase()

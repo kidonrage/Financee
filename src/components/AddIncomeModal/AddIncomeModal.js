@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import NumberFormat from 'react-number-format'
 import {
   Button,
@@ -48,6 +48,25 @@ const AddIncomeModal = ({open, handleClose}) => {
       .then(setIncomeSources)
   }, [])
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    const {incomeAmount, incomeSource} = values
+    
+    firebase.addIncome(incomeAmount, JSON.parse(incomeSource))
+      .then(() => {
+        alert("Доход добавлен успешно!")
+        handleOpenModal()
+      })
+  }
+
+  const handleOpenModal = useCallback(() => {
+    setValues({
+      incomeSource: '',
+      incomeAmount: '0',
+    })
+  }, [])
+
   return (
     <>
       <Dialog
@@ -55,58 +74,64 @@ const AddIncomeModal = ({open, handleClose}) => {
         open={open}
         onClose={handleClose}
         aria-labelledby="responsive-dialog-title"
+        onEnter={handleOpenModal}
       >
         <DialogTitle id="responsive-dialog-title">Добавить новый доход</DialogTitle>
-        <DialogContent>
 
-          <DialogContentText className={classes.formCaption}>Выберите источник дохода, введите сумму и нажмите кнопку "Добавить"</DialogContentText>
+        <form onSubmit={handleSubmit}>
 
-          <FormControl className={classes.formControl}>
-              <TextField
-                className={classes.incomeAmount}
-                label="Сумма"
-                value={values.incomeAmount}
-                onChange={handleChange}
-                name="incomeAmount"
-                variant="outlined"
-                id="formatted-incomeAmount-input"
-                InputProps={{
-                  inputComponent: AmountFormat,
-                }}
-              />
-            </FormControl>
+          <DialogContent>
+            <DialogContentText className={classes.formCaption}>Выберите источник дохода, введите сумму и нажмите кнопку "Добавить"</DialogContentText>
 
-            <FormControl variant="outlined" className={classes.formControl}>
-              <InputLabel id="incomeSourceLabel">Источник дохода</InputLabel>
-              <Select 
-                className={classes.incomeSource}
-                labelId="incomeSourceLabel" 
-                id="incomeSource" 
-                name="incomeSource"
-                value={values.incomeSource}
-                onChange={handleChange}
-                label="Источник дохода"
-                disabled={!incomeSources.length}
-              >
-                {incomeSources.map((source, idx) => <MenuItem key={idx} value={JSON.stringify(source)}>{source.name}</MenuItem>)}
-              </Select>
-              <FormHelperText 
-                className={classes.addIncomeSource}
-                onClick={() => setIncomeSourceModalOpen(true)}
-              >
-                Добавить источник дохода
-              </FormHelperText>
-            </FormControl>
+            <FormControl className={classes.formControl}>
+                <TextField
+                  className={classes.incomeAmount}
+                  label="Сумма"
+                  value={values.incomeAmount}
+                  onChange={handleChange}
+                  name="incomeAmount"
+                  variant="outlined"
+                  id="formatted-incomeAmount-input"
+                  InputProps={{
+                    inputComponent: AmountFormat,
+                  }}
+                />
+              </FormControl>
 
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleClose} color="secondary">
-            Отмена
-          </Button>
-          <Button onClick={handleClose} color="primary" autoFocus>
-            Добавить
-          </Button>
-        </DialogActions>
+              <FormControl variant="outlined" className={classes.formControl}>
+                <InputLabel id="incomeSourceLabel">{incomeSources.length ? "Источник дохода" : "Нет источников дохода"}</InputLabel>
+                <Select 
+                  className={classes.incomeSource}
+                  labelId="incomeSourceLabel" 
+                  id="incomeSource" 
+                  name="incomeSource"
+                  value={values.incomeSource}
+                  onChange={handleChange}
+                  label={incomeSources.length ? "Источник дохода" : "Нет источников дохода"}
+                  disabled={!incomeSources.length}
+                >
+                  {incomeSources.map((source, idx) => <MenuItem key={idx} value={JSON.stringify(source)}>{source.name}</MenuItem>)}
+                </Select>
+                <FormHelperText 
+                  className={classes.addIncomeSource}
+                  onClick={() => setIncomeSourceModalOpen(true)}
+                >
+                  Добавить источник дохода
+                </FormHelperText>
+              </FormControl>
+          </DialogContent>
+
+          <DialogActions>
+            <Button autoFocus onClick={handleClose} color="secondary">
+              Отмена
+            </Button>
+            <Button type="submit" color="primary" autoFocus>
+              Добавить
+            </Button>
+          </DialogActions>
+
+        </form>
+
       </Dialog>
       <AddIncomeSourceModal 
         open={incomeSourceModalOpen}
