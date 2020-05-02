@@ -54,7 +54,7 @@ class Firebase {
       .then(doc => {
         if (doc.exists) {
           const {sources} = doc.data()
-
+          
           return sources && sources.length ? sources : []
         } else {
           return []
@@ -72,6 +72,12 @@ class Firebase {
     .catch(error => {
       alert("Не удалось добавить доход")
     })
+  }
+
+  getIncomesRef() {
+    const {uid} = this.auth.currentUser
+
+    return this.db.collection(`incomes/${uid}/items`)
   }
 }
 

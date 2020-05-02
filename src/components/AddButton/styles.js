@@ -3,6 +3,7 @@ export default theme => ({
     position: 'fixed',
     bottom: theme.spacing(3),
     right: theme.spacing(3),
+    zIndex: 1000
   },
   rootOpen: {
     '& $openButton': {
