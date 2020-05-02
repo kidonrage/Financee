@@ -54,7 +54,7 @@ class Firebase {
       .then(doc => {
         if (doc.exists) {
           const {sources} = doc.data()
-          
+
           return sources && sources.length ? sources : []
         } else {
           return []
@@ -62,11 +62,12 @@ class Firebase {
       })
   }
 
-  addIncome(amount, source) {
+  addIncome(amount, goalSaving, source) {
     const {uid} = this.auth.currentUser
     
     return this.db.collection(`incomes/${uid}/items`).add({
       amount: parseInt(amount, 10),
+      goalSaving: parseInt(goalSaving, 10),
       source: source
     })
     .catch(error => {

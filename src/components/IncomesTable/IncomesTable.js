@@ -65,7 +65,7 @@ const IncomesTable = ({incomes}) => {
                   />
                 </StyledTableCell>
                 <StyledTableCell align="right">{income.amount}</StyledTableCell>
-                <StyledTableCell align="right">{income.saved}</StyledTableCell>
+                <StyledTableCell align="right">{income.goalSaving}</StyledTableCell>
                 <StyledTableCell align="right">{income.date}</StyledTableCell>
               </StyledTableRow>
             ))}
