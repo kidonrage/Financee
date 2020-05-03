@@ -10,10 +10,10 @@ export default theme => ({
     textOverflow: 'ellipsis',
     paddingRight: theme.spacing(1)
   }, 
-  purposeCurrent: {
+  goalSavings: {
     fontWeight: theme.typography.fontWeightMedium
   },
-  purposeTotal: {
+  goalTotal: {
   },
   currency: {
     color: theme.palette.primary.main

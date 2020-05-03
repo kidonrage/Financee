@@ -4,7 +4,7 @@ import styles from './styles'
 
 const useStyles = makeStyles(styles)
 
-const MonthOverview = () => {
+const MonthOverview = ({currency}) => {
   const classes = useStyles()
 
   return (
@@ -13,15 +13,15 @@ const MonthOverview = () => {
       <CardContent className={classes.content}>
         <Grid container spacing={3} justify="space-around">
           <Grid item xs={12} md>
-            <Typography variant="h4" component="span" className={classes.amount}>190000₽</Typography>
+            <Typography variant="h4" component="span" className={classes.amount}>190000{currency}</Typography>
             <Typography variant="subtitle2" component="span" className={classes.caption}>Общий доход</Typography>
           </Grid>
           <Grid item xs={12} md>
-            <Typography variant="h4" component="span" className={classes.amount}>190000₽</Typography>
+            <Typography variant="h4" component="span" className={classes.amount}>190000{currency}</Typography>
             <Typography variant="subtitle2" component="span" className={classes.caption}>Сбережения</Typography>
           </Grid>
           <Grid item xs={12} md>
-            <Typography variant="h4" component="span" className={classes.amount}>190000₽</Typography>
+            <Typography variant="h4" component="span" className={classes.amount}>190000{currency}</Typography>
             <Typography variant="subtitle2" component="span" className={classes.caption}>Свободных средств</Typography>
           </Grid>
         </Grid>

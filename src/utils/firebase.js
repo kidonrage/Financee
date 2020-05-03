@@ -18,6 +18,7 @@ class Firebase {
     app.initializeApp(config)
     this.auth = app.auth()
     this.db = app.firestore()
+    this.functions = firebase.functions()
   }
 
   login(email, password) {
@@ -32,6 +33,33 @@ class Firebase {
     await this.auth.createUserWithEmailAndPassword(email, password)
     return this.auth.currentUser.updateProfile({
       displayName: name
+    })
+  }
+
+  setUserGoal(goal, currency) {
+    const {uid} = this.auth.currentUser
+
+    const userDataRef = this.db.collection(`users`).doc(uid)
+    return userDataRef.set(
+      { goal, currency },
+      { merge: true }
+    )
+    .then(() => {
+      const addMessage = this.functions.httpsCallable('setUserCurrency');
+      return addMessage({ 
+        currency: currency.label 
+      })
+    })
+    .then(() => {
+      alert("Всё добавлено!")
+    })
+    .catch(error => {
+      if (error.code === 'permission-denied') {
+        alert("Permission denied!")
+        return
+      }
+
+      console.error("Error!", JSON.stringify(error))
     })
   }
 
@@ -79,6 +107,19 @@ class Firebase {
     const {uid} = this.auth.currentUser
 
     return this.db.collection(`incomes/${uid}/items`)
+  }
+
+  getUserData() {
+    const {uid} = this.auth.currentUser
+
+    return this.db.collection(`users`).doc(uid).get()
+      .then(doc => {
+        if (!doc.exists) {
+          throw new Error("Нет юзера еще")
+        }
+
+        return doc.data()
+      })
   }
 }
 

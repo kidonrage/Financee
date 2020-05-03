@@ -1,16 +1,27 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PurposeProgress from '../../components/PurposeProgress'
 import { Grid, Typography, makeStyles } from '@material-ui/core'
 import styles from './styles'
 import FactPlanDifference from '../../components/FactPlanDifference'
 import MonthOverview from '../../components/MonthOverview'
 import { AuthContext } from '../../components/Auth'
+import firebase from '../../utils/firebase'
 
 const useStyles = makeStyles(styles)
 
 const Dashborad = () => {
   const classes = useStyles()
-  const {currentUser} = useContext(AuthContext)
+  const { currentUser } = useContext(AuthContext)
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    firebase.getUserData()
+      .then(setUserData)
+      .catch(() => setUserData({
+        goal: 0,
+        goalProgress: 0
+      }))
+  }, [])
 
   return (
     <>
@@ -19,16 +30,17 @@ const Dashborad = () => {
         <Grid className={classes.bottomSpacingGrid} item xs={12} md={6} direction="column" alignItems="stretch" container>
           <Grid item>
             <PurposeProgress
-              purposeCurrent={69000}
-              purposeTotal={500000}
+              goalSavings={userData.goalProgress}
+              goalTotal={userData.goal}
+              currency={currentUser.customClaims.currency}
             />
           </Grid>
           <Grid item>
-            <MonthOverview />
+            <MonthOverview currency={currentUser.customClaims.currency} />
           </Grid>
         </Grid>
         <Grid item xs={12} md={6}>
-          <FactPlanDifference />
+          <FactPlanDifference currency={currentUser.customClaims.currency} />
         </Grid>
       </Grid>
     </>

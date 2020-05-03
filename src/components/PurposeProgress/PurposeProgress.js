@@ -4,16 +4,16 @@ import styles from './styles'
 
 const useStyles = makeStyles(styles)
 
-const PurposeProgress = ({purposeCurrent = 0, purposeTotal = 0, currency = '₽'}) => {
+const PurposeProgress = ({goalSavings = 0, goalTotal = 0, currency = '₽'}) => {
   const classes = useStyles()
 
   const progressValue = useMemo(() => {
-    if (!purposeCurrent || !purposeTotal) {
+    if (!goalSavings || !goalTotal) {
       return 0
     }
 
-    return 100 / (purposeTotal / purposeCurrent)
-  }, [purposeCurrent, purposeTotal])
+    return 100 / (goalTotal / goalSavings)
+  }, [goalSavings, goalTotal])
 
   return (
     <Card className={classes.root}>
@@ -23,8 +23,8 @@ const PurposeProgress = ({purposeCurrent = 0, purposeTotal = 0, currency = '₽'
       <CardContent>
         <div className={classes.purposeProgressInfo}>
           <div className={classes.purposeNumbers}>
-            <Typography variant="h3" component="span" className={classes.purposeCurrent}>{purposeCurrent}/</Typography>
-            <Typography variant="h5" component="span" className={classes.purposeTotal}>{purposeTotal}</Typography>
+            <Typography variant="h3" component="span" className={classes.goalSavings}>{goalSavings}/</Typography>
+            <Typography variant="h5" component="span" className={classes.goalTotal}>{goalTotal}</Typography>
           </div>
           <div>
           <Typography variant="h3" component="span" className={classes.currency}>{currency}</Typography>

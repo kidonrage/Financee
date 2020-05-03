@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { useContext, useMemo } from 'react'
 import NumberFormat from 'react-number-format'
+import { AuthContext } from './Auth'
 
 export default function AmountFormat({ name, inputRef, onChange, ...other }) {
+  let {currentUser} = useContext(AuthContext)
+
+  const currencySuffix = useMemo(() => {
+    if (!currentUser.customClaims || !currentUser.customClaims.currency) {
+      return ''
+    }
+    
+    return ` ${currentUser.customClaims.currency}`
+  }, [currentUser])
+
   return (
     <NumberFormat
       {...other}
@@ -16,7 +27,7 @@ export default function AmountFormat({ name, inputRef, onChange, ...other }) {
       }}
       thousandSeparator=" "
       isNumericString
-      suffix=" ₽"
+      suffix={currencySuffix}
     />
   )
 }

@@ -76,4 +76,4 @@ const IncomesTable = ({incomes}) => {
   )
 }
 
-export default forwardRef(IncomesTable);
+export default IncomesTable;
