@@ -1,4 +1,4 @@
-import React, {Suspense} from 'react'
+import React, {Suspense, useContext} from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import {
@@ -18,11 +18,14 @@ import MenuOpenIcon from '@material-ui/icons/Menu';
 import styles from './styles'
 import TopBar from '../TopBar'
 import NavList from '../NavList/NavList'
+import { LoadingContext } from '../Loading'
 
 const useStyles = makeStyles(styles)
 
 const AppDrawer = ({children}) => {
   const classes = useStyles()
+  const {loading} = useContext(LoadingContext)
+
   const [open, setOpen] = React.useState(false)
 
   const handleDrawerToggle = () => {
@@ -86,6 +89,7 @@ const AppDrawer = ({children}) => {
       
       <div className={classes.contentWrapper}>
         <Suspense fallback={<LinearProgress />}>
+          {loading && <LinearProgress />}
           <main className={classes.content}>
             {children}
           </main>

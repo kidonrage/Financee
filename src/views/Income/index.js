@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, createRef } from 'react'
+import React, { useState, useEffect, useContext, useCallback, createRef } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core'
 import BottomScrollListener from 'react-bottom-scroll-listener';
@@ -6,6 +6,7 @@ import IncomesTable from '../../components/IncomesTable'
 import { getIncomes, getNextIncomes } from './requests'
 import styles from './styles'
 import Spinner from '../../components/Spinner'
+import { LoadingContext } from '../../components/Loading'
 
 const pageSize = 10
 
@@ -13,10 +14,16 @@ const useStyles = makeStyles(styles)
 
 const Income = () => {
   const classes = useStyles()
-  const [loading, setLoading] = useState([])
-  const [incomes, setIncomes] = useState([])
-  const [lastVisible, setLastVisible] = useState([])
+  const { loading, setLoading } = useContext(LoadingContext)
+
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [incomesData, setIncomesData] = useState({
+    incomes: [],
+    lastVisible: null
+  })
   const [isAllLoaded, setIsAllLoaded] = useState(false)
+
+  const tableRef = createRef()
 
   useEffect(() => {
     setLoading(true)
@@ -24,52 +31,73 @@ const Income = () => {
     getIncomes(pageSize)
       .then((fetchedData) => {
         const {incomes, lastDocument} = fetchedData;
-        setIncomes(incomes)
 
-        if (lastDocument) {
-          setLastVisible(lastDocument)
-        } else {
+        setIncomesData({
+          incomes,
+          lastVisible: lastDocument
+        })
+
+        if (incomes.length < pageSize || !lastDocument) {
+          setLoading(false)
           setIsAllLoaded(true)
         }
-      })
-      .finally(() => {
-        setLoading(false)
       })
   }, [])
 
   const getMoreIncomes = useCallback(() => {
+    const { lastVisible } = incomesData
     if (!lastVisible) {
       return []
     }
 
-    setLoading(true)
+    setLoadingMore(true)
     
     getNextIncomes(pageSize, lastVisible)
       .then((fetchedData) => {
         const {lastDocument} = fetchedData;
-        setIncomes([...incomes, ...fetchedData.incomes])
-        
-        if (lastDocument) {
-          setLastVisible(lastDocument)
-        } else {
+
+        setIncomesData(prevIncomesData => ({
+          incomes: [...prevIncomesData.incomes, ...fetchedData.incomes],
+          lastVisible: lastDocument
+        }))
+
+        if (fetchedData.incomes.length < pageSize || !lastDocument) {
           setIsAllLoaded(true)
         }
       })
       .finally(() => {
-        setLoading(false)
+        console.log('setLoadingMore(false) getMoreIncomes')
+        setLoadingMore(false)
       })
-  }, [lastVisible, incomes])
+  }, [incomesData])
 
-  if (!incomes.length) {
+  useEffect(() => {
+    const {incomes} = incomesData
+
+    if (!loading || !tableRef.current || !incomes.length) {
+      return
+    }
+
+    let bottomOffset = tableRef.current.getBoundingClientRect().bottom - window.innerHeight
+    console.log(bottomOffset)
+
+    if (bottomOffset < 0) {
+      getMoreIncomes()
+    } else {
+      setLoading(false)
+    }
+  }, [incomesData, getMoreIncomes, loading, isAllLoaded, tableRef.current])
+
+  if (!incomesData.incomes.length) {
     return <p>Нет добавленных доходов</p>
   }
 
   return (
-    <BottomScrollListener onBottom={isAllLoaded ? () => {} : getMoreIncomes} >
-      <div className={classes.root}>
+    <BottomScrollListener onBottom={isAllLoaded ? () => {} : () => {console.log('bottom'); getMoreIncomes()}} >
+      <div className={classes.root} ref={tableRef}>
         <div className={classes.table}>
           <IncomesTable
-            incomes={incomes}
+            incomes={incomesData.incomes}
           />
         </div>
 
@@ -79,7 +107,7 @@ const Income = () => {
 
         <Spinner 
           className={clsx(classes.loader, {
-            [classes.activeLoader]: loading
+            [classes.activeLoader]: loadingMore
           })}
         />
       </div>

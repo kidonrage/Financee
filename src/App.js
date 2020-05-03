@@ -7,15 +7,18 @@ import AuthProvider from './components/Auth'
 import history from './utils/history'
 import routes from './routes'
 import theme from './theme'
+import LoadingProvider from './components/Loading'
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <Router history={history}>
-          {renderRoutes(routes)}
-        </Router>
+        <LoadingProvider>
+          <Router history={history}>
+            {renderRoutes(routes)}
+          </Router>
+        </LoadingProvider>
       </AuthProvider>
     </ThemeProvider>
   )
