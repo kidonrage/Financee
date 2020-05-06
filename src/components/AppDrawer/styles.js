@@ -73,4 +73,9 @@ export default (theme) => ({
   content: {
     padding: theme.spacing(5, 0),
   },
+  progressBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0
+  }
 })

@@ -6,21 +6,26 @@ import FactPlanDifference from '../../components/FactPlanDifference'
 import MonthOverview from '../../components/MonthOverview'
 import { AuthContext } from '../../components/Auth'
 import firebase from '../../utils/firebase'
+import { LoadingContext } from '../../components/Loading'
 
 const useStyles = makeStyles(styles)
 
 const Dashborad = () => {
   const classes = useStyles()
   const { currentUser } = useContext(AuthContext)
+  const { loading, setLoading } = useContext(LoadingContext)
   const [userData, setUserData] = useState({})
 
   useEffect(() => {
+    setLoading(true)
+
     firebase.getUserData()
       .then(setUserData)
       .catch(() => setUserData({
         goal: 0,
         goalProgress: 0
       }))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
