@@ -1,23 +1,15 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, {useState, useMemo} from 'react'
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
   DialogContentText,
-  DialogTitle,
-  TextField,
   FormControl,
-  useMediaQuery,
   MenuItem,
-  useTheme,
   makeStyles,
+  TextField,
+  withStyles,
   FormHelperText,
-  withStyles
 } from '@material-ui/core'
+import AmountFormat from '../../AmountFormat'
 import moment from 'moment'
-import firebase from '../../utils/firebase'
-import AmountFormat from '../AmountFormat'
 import styles from './styles'
 
 const currencies = [
@@ -33,26 +25,20 @@ const currencies = [
     value: 'EUR',
     label: '€',
   },
-  // {
-  //   value: 'BTC',
-  //   label: '฿',
-  // },
 ];
 
 const GoalTextField = withStyles({
   root: {
     '& .MuiInput-input': {
-      fontSize: 24
+      fontSize: 32
     }
   },
 })(TextField);
 
 const useStyles = makeStyles(styles)
 
-const GoalModal = ({open, handleClose}) => {
+const SetGoalForm = () => {
   const classes = useStyles()
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [values, setValues] = useState({
     goal: '0',
@@ -60,17 +46,9 @@ const GoalModal = ({open, handleClose}) => {
   })
 
   const untilDate = useMemo(() => {
-
     return moment().add(1, 'yers').format('DD.MM.YYYY')
-  })
-
-  const handleOpenModal = useCallback(() => {
-    setValues({
-      goal: '0',
-      currency: 'RUB'
-    })
   }, [])
-
+  
   const handleChange = (event) => {
     setValues({
       ...values,
@@ -78,29 +56,9 @@ const GoalModal = ({open, handleClose}) => {
     })
   }
 
-  const handleSave = () => {
-    const {goal, currency} = values
-
-    const currencyData = currencies.find(item => item.value === currency)
-
-    firebase.setUserGoal(goal, currencyData)
-      .then(() => {
-        handleClose()
-      })
-  }
-
   return (
-    <Dialog
-      fullScreen={fullScreen}
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="responsive-dialog-title"
-      onEnter={handleOpenModal}
-    >
-      <DialogTitle id="responsive-dialog-title">Поставить цель</DialogTitle>
-      <DialogContent>
-
-        <DialogContentText className={classes.formCaption}>Привет!</DialogContentText>
+    <>
+      <DialogContentText className={classes.formCaption}>Привет!</DialogContentText>
         <DialogContentText className={classes.formCaption}>Похоже, Вы только что зарегестрировались и ещё не поставили Цель, с которой будете работать в приложении. Самое время сделать это!</DialogContentText>
         <DialogContentText className={classes.formCaption}>Расскажите о своей <b>Цели на следующий год</b> и нажмите кнопку "Сохранить"</DialogContentText>
 
@@ -137,15 +95,8 @@ const GoalModal = ({open, handleClose}) => {
         </div>
 
         <FormHelperText id="my-helper-text">Не забудьте выбрать валюту, в которой будете вести учет.</FormHelperText>
-
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleSave} color="primary" autoFocus>
-          Сохранить
-        </Button>
-      </DialogActions>
-    </Dialog>
+    </>
   )
 }
 
-export default GoalModal
+export default SetGoalForm
