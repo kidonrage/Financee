@@ -63,14 +63,15 @@ class Firebase {
     })
   }
 
-  addIncomeSource(name, color) {
+  addIncomeSource(name, color, expectedSavingPercentage) {
     const {uid} = this.auth.currentUser
     
     const userIncomeSourcesRef = this.db.collection(`incomeSources`).doc(uid)
     return userIncomeSourcesRef.set({
       sources: firebase.firestore.FieldValue.arrayUnion({
         name,
-        color
+        color,
+        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10)
       })
     }, {merge: true})
   }

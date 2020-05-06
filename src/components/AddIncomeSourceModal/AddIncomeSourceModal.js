@@ -21,8 +21,15 @@ import { getContrastingColor } from 'react-color/lib/helpers'
 import styles from './styles'
 import firebase from '../../utils/firebase'
 import { getRandomColors } from '../../utils/colors'
+import PercentageFormat from '../PercentageFormat'
 
 const useStyles = makeStyles(styles)
+
+const defaultValues = {
+  name: '',
+  color: '#000',
+  expectedSavingPercentage: '20'
+}
 
 const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
   const classes = useStyles()
@@ -31,10 +38,7 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
 
   const [pickerAnchor, setPickerAnchor] = React.useState(null);
   const [pickerColors, setPickerColors] = React.useState([]);
-  const [values, setValues] = useState({
-    name: '',
-    color: '#000'
-  })
+  const [values, setValues] = useState(defaultValues)
 
   const pickerOpen = Boolean(pickerAnchor);
 
@@ -61,13 +65,14 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
   };
 
   const handleAdd = () => {
-    const {name, color} = values
+    const {name, color, expectedSavingPercentage} = values
 
-    firebase.addIncomeSource(name, color)
+    firebase.addIncomeSource(name, color, expectedSavingPercentage)
       .then(() => {
         onAdd({
           name, 
-          color
+          color,
+          expectedSavingPercentage
         })
       })
       .catch(error => {
@@ -88,7 +93,7 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
       .then(colors => {
         setPickerColors(colors)
         setValues({
-          name: '',
+          ...defaultValues,
           color: colors[0]
         })
       })
@@ -114,6 +119,19 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
             onChange={handleChange}
             name="name"
             variant="outlined"
+          />
+        </FormControl>
+
+        <FormControl className={classes.formControl}>
+          <TextField
+            label="Планируемый % сохранения от дохода"
+            value={values.expectedSavingPercentage}
+            onChange={handleChange}
+            name="expectedSavingPercentage"
+            variant="outlined"
+            InputProps={{
+              inputComponent: PercentageFormat,
+            }}
           />
         </FormControl>
 
