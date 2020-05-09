@@ -6,41 +6,28 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  TextField,
-  FormControl,
-  FormHelperText,
-  Popover,
-  Chip,
   useMediaQuery,
   useTheme,
   makeStyles
 } from '@material-ui/core'
-import clsx from 'clsx'
-import { BlockPicker } from 'react-color'
-import { getContrastingColor } from 'react-color/lib/helpers'
 import styles from './styles'
 import firebase from '../../utils/firebase'
 import { getRandomColors } from '../../utils/colors'
-import PercentageFormat from '../PercentageFormat'
+import AddIncomeSourceForm from '../AddIncomeSourceForm/AddIncomeSourceForm'
 
 const useStyles = makeStyles(styles)
-
-const defaultValues = {
-  name: '',
-  color: '#000',
-  expectedSavingPercentage: '20'
-}
 
 const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
   const classes = useStyles()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const [pickerAnchor, setPickerAnchor] = React.useState(null);
   const [pickerColors, setPickerColors] = React.useState([]);
-  const [values, setValues] = useState(defaultValues)
-
-  const pickerOpen = Boolean(pickerAnchor);
+  const [values, setValues] = useState({
+    name: '',
+    expectedSavingPercentage: '20',
+    color: '#000'
+  })
 
   const handleChange = (event) => {
     setValues({
@@ -56,23 +43,15 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
     })
   }
 
-  const handlePickerOpen = (event) => {
-    setPickerAnchor(event.currentTarget);
-  };
-
-  const handlePickerClose = () => {
-    setPickerAnchor(null);
-  };
-
   const handleAdd = () => {
-    const {name, color, expectedSavingPercentage} = values
+    const {name, expectedSavingPercentage, color} = values
 
-    firebase.addIncomeSource(name, color, expectedSavingPercentage)
+    firebase.addIncomeSource(name, expectedSavingPercentage, color)
       .then(() => {
         onAdd({
-          name, 
-          color,
-          expectedSavingPercentage
+          name,
+          expectedSavingPercentage,
+          color
         })
       })
       .catch(error => {
@@ -93,7 +72,7 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
       .then(colors => {
         setPickerColors(colors)
         setValues({
-          ...defaultValues,
+          name: '',
           color: colors[0]
         })
       })
@@ -112,67 +91,14 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
 
         <DialogContentText className={classes.formCaption}>Расскажите о новом источнике дохода и нажмите кнопку "Добавить"</DialogContentText>
 
-        <FormControl className={classes.formControl}>
-          <TextField
-            label="Название"
-            value={values.name}
-            onChange={handleChange}
-            name="name"
-            variant="outlined"
-          />
-        </FormControl>
-
-        <FormControl className={classes.formControl}>
-          <TextField
-            label="Планируемый % сохранения от дохода"
-            value={values.expectedSavingPercentage}
-            onChange={handleChange}
-            name="expectedSavingPercentage"
-            variant="outlined"
-            InputProps={{
-              inputComponent: PercentageFormat,
-            }}
-          />
-        </FormControl>
-
-        <FormControl className={clsx(classes.formControl, classes.colorControl)}>
-          <FormHelperText className={classes.colorInputCaption}>
-            Выберите цвет отметки:
-          </FormHelperText>
-          <Chip 
-            size="small" 
-            className={classes.colorInput} 
-            style={{
-              backgroundColor: values.color,
-              color: getContrastingColor(values.color)
-            }}
-            onClick={handlePickerOpen}
-            label={values.name}
-          />
-          <Popover 
-            open={pickerOpen}
-            anchorEl={pickerAnchor}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            transformOrigin={{
-              vertical: -8,
-              horizontal: 'center',
-            }}
-            onClose={handlePickerClose}
-            classes={{
-              paper: classes.colorInputPopover
-            }}
-          >
-            <BlockPicker 
-              color={ values.color }
-              onChangeComplete={ handleColorChange }
-              onChange={ handleColorChange }
-              colors={pickerColors}
-            />
-          </Popover>
-        </FormControl>        
+        <AddIncomeSourceForm 
+          name={values.name}
+          expectedSavingPercentage={values.expectedSavingPercentage}
+          color={values.color}
+          colors={pickerColors}
+          handleChange={handleChange}
+          handleColorChange={handleColorChange}
+        />      
 
       </DialogContent>
       <DialogActions>

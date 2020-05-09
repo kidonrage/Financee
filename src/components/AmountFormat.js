@@ -6,7 +6,7 @@ export default function AmountFormat({ name, inputRef, onChange, ...other }) {
   let {currentUser} = useContext(AuthContext)
 
   const currencySuffix = useMemo(() => {
-    if (!currentUser.customClaims || !currentUser.customClaims.currency) {
+    if (!currentUser || !currentUser.customClaims || !currentUser.customClaims.currency) {
       return ''
     }
     
