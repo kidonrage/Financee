@@ -42,11 +42,11 @@ const store = admin.firestore();
 
 // ================ FUNCTIONS ================
 
-exports.onIncomeCreates = functions.firestore.document('incomes/{userId}/items/{itemId}')
+exports.onIncomeCreates = functions.firestore.document('{userId}/incomes/items/{itemId}')
   .onWrite((change, context) => {
     const incomeData = change.after.data()
     if (incomeData && incomeData.goalSaving) {
-      store.doc('users/' + context.params.userId).update({
+      store.doc(context.params.userId + '/userData').update({
         goalProgress: admin.firestore.FieldValue.increment(incomeData.goalSaving)
       })
     } else {
@@ -56,6 +56,22 @@ exports.onIncomeCreates = functions.firestore.document('incomes/{userId}/items/{
       return null
     }
   })
+
+exports.addUserIncome = functions.https.onCall((data, context) => {
+  const { amount, goalSaving, source } = data
+
+  if (typeof amount !== 'number' || typeof goalSaving !== 'number' || !source) {
+    throw new functions.https.HttpsError('invalid-argument', 'Отправлены невалидные данные.');
+  }
+
+  if (amount < goalSaving) {
+    throw new functions.https.HttpsError('invalid-argument', 'Размер дохода не может быть меньше инвестиции в цель');
+  }
+
+  const uid = context.auth.uid;
+
+  
+})
 
 exports.setUserCurrency = functions.https.onCall((data, context) => {
   const currency = data.currency;
@@ -77,6 +93,16 @@ exports.setUserCurrency = functions.https.onCall((data, context) => {
     currency
   })
 });
+
+exports.initUserData = functions.auth.user().onCreate((user) => {
+  const uid = user.uid
+
+  store.doc(uid + '/userData').set({
+    goalProgress: 0,
+    totalIncome: 0,
+  })
+});
+
   
 
 // exports.onUserDataChange = functions.firestore.document('users/{userId}')

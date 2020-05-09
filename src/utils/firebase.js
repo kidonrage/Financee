@@ -39,7 +39,7 @@ class Firebase {
   setUserGoal(goal, currency) {
     const {uid} = this.auth.currentUser
 
-    const userDataRef = this.db.collection(`users`).doc(uid)
+    const userDataRef = this.db.doc(`${uid}/userData`)
     return userDataRef.set(
       { goal, currency },
       { merge: true }
@@ -63,10 +63,10 @@ class Firebase {
     })
   }
 
-  addIncomeSource(name, color, expectedSavingPercentage) {
+  addIncomeSource(name, expectedSavingPercentage, color) {
     const {uid} = this.auth.currentUser
     
-    const userIncomeSourcesRef = this.db.collection(`incomeSources`).doc(uid)
+    const userIncomeSourcesRef = this.db.doc(`${uid}/incomeSources`)
     return userIncomeSourcesRef.set({
       sources: firebase.firestore.FieldValue.arrayUnion({
         name,
@@ -79,7 +79,7 @@ class Firebase {
   getIncomeSources() {
     const {uid} = this.auth.currentUser
 
-    return this.db.collection(`incomeSources`).doc(uid).get()
+    return this.db.doc(`${uid}/incomeSources`).get()
       .then(doc => {
         if (doc.exists) {
           const {sources} = doc.data()
@@ -94,7 +94,7 @@ class Firebase {
   addIncome(amount, goalSaving, source) {
     const {uid} = this.auth.currentUser
     
-    return this.db.collection(`incomes/${uid}/items`).add({
+    return this.db.collection(`${uid}/incomes/items`).add({
       amount: parseInt(amount, 10),
       goalSaving: parseInt(goalSaving, 10),
       source: source
@@ -107,13 +107,13 @@ class Firebase {
   getIncomesRef() {
     const {uid} = this.auth.currentUser
 
-    return this.db.collection(`incomes/${uid}/items`)
+    return this.db.collection(`${uid}/incomes/items`)
   }
 
   getUserData() {
     const {uid} = this.auth.currentUser
 
-    return this.db.collection(`users`).doc(uid).get()
+    return this.db.doc(`${uid}/userData`).get()
       .then(doc => {
         if (!doc.exists) {
           throw new Error("Нет юзера еще")
