@@ -99,7 +99,7 @@ exports.setMainSource = functions.https.onCall((data, context) => {
   )
 });
 
-exports.addExtraSource = functions.https.onCall((data, context) => {
+exports.addExtraSource = functions.https.onCall(async (data, context) => {
   const {name, expectedSavingPercentage, color} = data;
 
   if (typeof name !== 'string' || !name.length || typeof expectedSavingPercentage !== 'number' || typeof color !== 'string') {
@@ -114,25 +114,34 @@ exports.addExtraSource = functions.https.onCall((data, context) => {
   const uid = context.auth.uid;
 
   const userDataRef = store.doc(uid + '/userData')
-  userDataRef.get()
-    .then(userData => {
-      const {extraSources} = userData
+
+  try {
+    const userData = await (await userDataRef.get()).data()
+
+    const {extraSources} = userData
+      
       if (extraSources && extraSources.length >= 4) {
-        throw new functions.https.HttpsError('too-much-incomes', 'Нельзя создать так много источников дохода');
+        throw new functions.https.HttpsError('out-of-range', 'Нельзя создать так много источников дохода');
       }
 
+      const newExtraSource = {
+        name,
+        color,
+        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10),
+        id: `extra${extraSources ? extraSources.length : 0}`
+      }
+
+      const newExtraSources = extraSources 
+        ? admin.firestore.FieldValue.arrayUnion(newExtraSource)
+        : [newExtraSource]
+
       return userDataRef.set({
-        extraSources: firebase.firestore.FieldValue.arrayUnion({
-          name,
-          color,
-          expectedSavingPercentage: parseInt(expectedSavingPercentage, 10),
-          id: `extra${extraSources.length}`
-        })
+        extraSources: newExtraSources
       }, {merge: true})
-    })
-    .catch(() => {
-      return null
-    })
+      .then(() => {return newExtraSource})
+  } catch (error) {
+    throw new functions.https.HttpsError(error.code, error.message)
+  }
 });
 
 exports.initUserData = functions.auth.user().onCreate((user) => {

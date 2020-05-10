@@ -37,7 +37,7 @@ const AddIncomeModal = ({open, handleClose}) => {
     goalSaving: '0'
   })
 
-  const {incomeSources, reload} = useContext(UserDataContext)
+  const {incomeSources, reloadUserData} = useContext(UserDataContext)
 
   const handleChange = (event) => {
     setValues({
@@ -151,9 +151,10 @@ const AddIncomeModal = ({open, handleClose}) => {
         open={incomeSourceModalOpen}
         handleClose={() => setIncomeSourceModalOpen(false)}
         onAdd={(newIncomeSource) => {
+          reloadUserData();
           setValues({
             ...values,
-            incomeSource: JSON.stringify(newIncomeSource)
+            incomeSource: newIncomeSource.id
           })
         }}
       />

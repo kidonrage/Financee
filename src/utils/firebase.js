@@ -1,3 +1,5 @@
+import React from 'react'
+import {useAlert} from 'react-alert'
 import firebase from 'firebase'
 import app from 'firebase/app'
 import 'firebase/auth'
@@ -14,11 +16,26 @@ const config = {
 }
 
 class Firebase {
-  constructor() {
+  constructor(alert = null) {
     app.initializeApp(config)
     this.auth = app.auth()
     this.db = app.firestore()
     this.functions = firebase.functions()
+    if (alert) {
+      this.alert = alert
+    }
+  }
+
+  catchError = (error) => {
+    if (!this.alert) {
+      return
+    }
+
+    if (error.code === 'permission-denied') {
+      this.alert.error("Нет доступа")
+    }
+
+    this.alert.error(error.toString())
   }
 
   login(email, password) {
@@ -50,61 +67,64 @@ class Firebase {
     .then(() => {
       alert("Всё добавлено!")
     })
-    .catch(error => {
-      if (error.code === 'permission-denied') {
-        alert("Permission denied!")
-        return
-      }
-
-      console.error("Error!", JSON.stringify(error))
-    })
+    .catch(this.catchError)
   }
 
   setMainIncomeSource(name, expectedSavingPercentage, color) {
     const setMainSource = this.functions.httpsCallable('setMainSource');
-    return setMainSource({ 
-      name, 
-      expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
-      color, 
+    return new Promise((resolve) => {
+      setMainSource({ 
+        name, 
+        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
+        color, 
+      })
+      .then(resolve)
+      .catch(this.catchError)
     })
-    .catch(e => console.error(JSON.stringify(e)))
   }
 
   addIncomeSource(name, expectedSavingPercentage, color) {
     const addExtraSource = this.functions.httpsCallable('addExtraSource');
-    return addExtraSource({ 
-      name, 
-      expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
-      color, 
+    return new Promise((resolve) => {
+      addExtraSource({ 
+        name, 
+        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
+        color, 
+      })
+      .then(resolve)
+      .catch(this.catchError)
     })
-    .catch(e => console.error(JSON.stringify(e)))
   }
 
   getIncomeSources() {
     const {uid} = this.auth.currentUser
 
-    return this.db.doc(`${uid}/incomeSources`).get()
+    return new Promise((resolve) => {
+      this.db.doc(`${uid}/incomeSources`).get()
       .then(doc => {
         if (doc.exists) {
           const {sources} = doc.data()
 
-          return sources && sources.length ? sources : []
+          resolve(sources && sources.length ? sources : [])
         } else {
-          return []
+          resolve([])
         }
       })
+      .catch(this.catchError)
+    })
   }
 
   addIncome(amount, goalSaving, source) {
     const {uid} = this.auth.currentUser
     
-    return this.db.collection(`${uid}/incomes/items`).add({
-      amount: parseInt(amount, 10),
-      goalSaving: parseInt(goalSaving, 10),
-      source: source
-    })
-    .catch(error => {
-      alert("Не удалось добавить доход")
+    return new Promise((resolve) => {
+      this.db.collection(`${uid}/incomes/items`).add({
+        amount: parseInt(amount, 10),
+        goalSaving: parseInt(goalSaving, 10),
+        source: source
+      })
+      .then(resolve)
+      .catch(this.catchError)
     })
   }
 
@@ -117,15 +137,35 @@ class Firebase {
   getUserData() {
     const {uid} = this.auth.currentUser
 
-    return this.db.doc(`${uid}/userData`).get()
+    return new Promise((resolve) => {
+      this.db.doc(`${uid}/userData`).get()
       .then(doc => {
         if (!doc.exists) {
-          return {}
+          resolve({})
         }
 
-        return doc.data()
+        resolve(doc.data())
       })
+      .catch(this.catchError)
+    })
   }
 }
 
-export default new Firebase()
+const firebaseInstance = new Firebase()
+
+const configureFirebase = (alert) => {
+  firebaseInstance.alert = alert
+}
+
+export const FirebaseProvider = ({children}) => {
+  const alert = useAlert()
+  configureFirebase(alert)
+
+  return (
+    <>
+      {children}
+    </>
+  )
+}
+
+export default firebaseInstance

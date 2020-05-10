@@ -47,22 +47,8 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
     const {name, expectedSavingPercentage, color} = values
 
     firebase.addIncomeSource(name, expectedSavingPercentage, color)
-      .then(() => {
-        onAdd({
-          name,
-          expectedSavingPercentage,
-          color
-        })
-      })
-      .catch(error => {
-        if (error.code === 'permission-denied') {
-          alert("Permission denied!")
-          return
-        }
-
-        console.error("Error!", JSON.stringify(error))
-      })
-      .finally(() => {
+      .then((data) => {
+        onAdd(data)
         handleClose()
       })
   }
@@ -73,6 +59,7 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
         setPickerColors(colors)
         setValues({
           name: '',
+          expectedSavingPercentage: '20',
           color: colors[0]
         })
       })
