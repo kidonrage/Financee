@@ -15,6 +15,16 @@ const config = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 }
 
+const errors = {
+  common: {
+    'permission-denied': 'Нет доступа',
+    'invalid-argument': 'Были отправлены невалидные данные'
+  },
+  incomeSource: {
+    'out-of-range': 'Нельзя создать больше 4-х доп. источников дохода'
+  }
+}
+
 class Firebase {
   constructor(alert = null) {
     app.initializeApp(config)
@@ -26,16 +36,21 @@ class Firebase {
     }
   }
 
-  catchError = (error) => {
+  catchError = (error, errorSubject) => {
     if (!this.alert) {
       return
     }
 
-    if (error.code === 'permission-denied') {
-      this.alert.error("Нет доступа")
-    }
+    let errorMessage = ''
 
-    this.alert.error(error.toString())
+    if (errorSubject && errors[errorSubject] && errors[errorSubject][error.code]) {
+      errorMessage = errors[errorSubject][error.code]
+    } else {
+      const commonErrorMessage = errors.common[error.code]
+      errorMessage = commonErrorMessage ? commonErrorMessage : error.toString()
+    }
+    
+    this.alert.error(errorMessage)
   }
 
   login(email, password) {
@@ -92,7 +107,7 @@ class Firebase {
         color, 
       })
       .then(resolve)
-      .catch(this.catchError)
+      .catch(error => this.catchError(error, 'incomeSource'))
     })
   }
 

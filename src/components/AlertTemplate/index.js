@@ -7,9 +7,9 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 const AlertTemplate = ({ style, options, message, close }) => {
   const useStyles = makeStyles(theme => {
     const backgroundColors = {
-      info: '#333',
-      error: theme.palette.secondary.main,
-      success: theme.palette.primary.main
+      info: theme.palette.info.main,
+      error: theme.palette.error.main,
+      success: theme.palette.success.main
     };
     return {
       root: {
