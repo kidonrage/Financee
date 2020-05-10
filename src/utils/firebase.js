@@ -41,7 +41,10 @@ class Firebase {
 
     const userDataRef = this.db.doc(`${uid}/userData`)
     return userDataRef.set(
-      { goal, currency },
+      { 
+        goal: parseInt(goal, 10),
+        currency
+      },
       { merge: true }
     )
     .then(() => {

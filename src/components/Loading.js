@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 
-export const AuthContext = React.createContext()
-
 export const LoadingContext = React.createContext()
 
 const LoadingProvider = ({ children }) => {

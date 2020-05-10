@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useContext, useEffect } from 'react'
 import {
   Button,
   Dialog,
@@ -16,22 +16,11 @@ import {
 import firebase from '../../utils/firebase'
 import styles from './styles'
 import SetGoalForm from './SetGoalForm'
+import AddMainSourceForm from './AddMainSourceForm'
+import { UserDataContext } from '../UserDataProvider'
 
 function getSteps() {
-  return ['Поставьте цель', 'Добавьте источник дохода', 'Планируйте'];
-}
-
-function getStepContent(stepIndex) {
-  switch (stepIndex) {
-    case 0:
-      return <SetGoalForm />;
-    case 1:
-      return 'What is an ad group anyways?';
-    case 2:
-      return 'This is the bit I really care about!';
-    default:
-      return 'Unknown stepIndex';
-  }
+  return ['Поставьте цель', 'Добавьте источник дохода'];
 }
 
 const useStyles = makeStyles(styles)
@@ -41,70 +30,84 @@ const InitialSetupModal = ({open, handleClose}) => {
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
+  const { userData, reloadUserData } = useContext(UserDataContext)
+
   const [activeStep, setActiveStep] = React.useState(0);
+  const [completed, setCompleted] = React.useState({});
+
+  useEffect(() => {
+    if (!userData || !userData.goal || !userData.currency) {
+      return;
+    }
+
+    if (!userData.mainSource) {
+      setActiveStep(1)
+      return
+    }
+
+    setActiveStep(2)
+  }, [userData])
+
+  useEffect(() => {
+    if (!userData) {
+      return
+    }
+
+    if (userData && userData.goal && userData.currency) {
+      setCompleted(completed => ({
+        ...completed,
+        0: true
+      }))
+    }
+
+    if (userData.mainSource) {
+      setCompleted(completed => ({
+        ...completed,
+        1: true
+      }))
+    }
+
+    if (userData.extraSources && userData.extraSources.length) {
+      setCompleted(completed => ({
+        ...completed,
+        2: true
+      }))
+    }
+  }, [userData])
 
   const steps = getSteps()
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleSave = () => {
-    // const {goal, currency} = values
-
-    // const currencyData = currencies.find(item => item.value === currency)
-
-    // firebase.setUserGoal(goal, currencyData)
-    //   .then(() => {
-    //     handleClose()
-    //   })
-  }
+  const stepContent = useMemo(() => {
+    switch (activeStep) {
+      case 0:
+        return <SetGoalForm onSaveSuccess={reloadUserData} />;
+      case 1:
+        return <AddMainSourceForm onSaveSuccess={reloadUserData} />;
+      default:
+        return 'Вы здесь оказались по ошибке. Попробуйте обновить страницу!';
+    }
+  }, [activeStep, reloadUserData])
 
   return (
     <Dialog
       fullScreen={fullScreen}
-      open={true}
+      open={open}
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
-      // className={}
       classes={{
         paper: classes.root
       }}
-      // onEnter={handleOpenModal}
     >
-      {/* <DialogTitle id="responsive-dialog-title">
-        
-      </DialogTitle> */}
-
       <Stepper activeStep={activeStep} className={classes.stepper}>
-        {steps.map((label) => (
+        {steps.map((label, index) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            <StepLabel completed={completed[index]}>{label}</StepLabel>
           </Step>
         ))}
       </Stepper>
 
-      <DialogContent>
-        
-        {getStepContent(activeStep)}
+      {stepContent}
 
-      </DialogContent>
-      <DialogActions>
-        <Button
-          disabled={activeStep === 0}
-          onClick={handleBack}
-          className={classes.backButton}
-        >
-          Назад
-        </Button>
-        <Button color="primary" autoFocus onClick={activeStep === steps.length - 1 ? handleSave : handleNext}>
-          {activeStep === steps.length - 1 ? 'Сохранить' : 'Далее'}
-        </Button>
-      </DialogActions>
     </Dialog>
   )
 }

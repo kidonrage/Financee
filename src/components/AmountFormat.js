@@ -1,17 +1,17 @@
 import React, { useContext, useMemo } from 'react'
 import NumberFormat from 'react-number-format'
-import { AuthContext } from './Auth'
+import { UserDataContext } from './UserDataProvider'
 
 export default function AmountFormat({ name, inputRef, onChange, ...other }) {
-  let {currentUser} = useContext(AuthContext)
+  let {userData} = useContext(UserDataContext)
 
   const currencySuffix = useMemo(() => {
-    if (!currentUser || !currentUser.customClaims || !currentUser.customClaims.currency) {
+    if (!userData || !userData.currency) {
       return ''
     }
     
-    return ` ${currentUser.customClaims.currency}`
-  }, [currentUser])
+    return ` ${userData.currency.label}`
+  }, [userData])
 
   return (
     <NumberFormat

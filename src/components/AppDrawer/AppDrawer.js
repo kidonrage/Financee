@@ -24,7 +24,7 @@ const useStyles = makeStyles(styles)
 
 const AppDrawer = ({children}) => {
   const classes = useStyles()
-  const {loading} = useContext(LoadingContext)
+  const { loading } = useContext(LoadingContext)
 
   const [open, setOpen] = React.useState(false)
 

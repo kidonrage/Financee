@@ -12,9 +12,9 @@ const useStyles = makeStyles(styles)
 const AuthLayout = ({route}) => {
   const classes = useStyles()
 
-  const {currentUser} = useContext(AuthContext)
+  const {authData} = useContext(AuthContext)
 
-  if (currentUser) {
+  if (authData) {
     return <Redirect to="/" />
   }
 
