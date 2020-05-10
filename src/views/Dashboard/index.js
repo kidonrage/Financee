@@ -29,10 +29,6 @@ const Dashborad = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) {
-    return <div>Грузим блять</div>
-  }
-
   return (
     <>
       <Typography variant="h2" component="h2" className={classes.header}>Добро пожаловать, {authData.displayName}!</Typography>

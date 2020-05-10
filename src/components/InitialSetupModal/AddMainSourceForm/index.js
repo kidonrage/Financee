@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import {
-  DialogContentText, makeStyles, DialogContent, DialogActions, Button
+  DialogContentText, makeStyles, DialogContent, DialogActions, Button, CircularProgress
 } from '@material-ui/core'
 import AddIncomeSourceForm from '../../AddIncomeSourceForm'
 import styles from './styles'
 import { getRandomColors } from '../../../utils/colors'
+import firebase from '../../../utils/firebase'
 
 const useStyles = makeStyles(styles)
 
 const AddMainSourceForm = ({onSaveSuccess}) => {
   const classes = useStyles()
 
-  const [pickerColors, setPickerColors] = React.useState([]);
+  const [loading, setLoading] = useState(false)
+  const [pickerColors, setPickerColors] = useState([]);
   const [values, setValues] = useState({
     name: '',
     expectedSavingPercentage: '20',
@@ -33,7 +35,15 @@ const AddMainSourceForm = ({onSaveSuccess}) => {
   }
 
   const handleSave = () => {
-    onSaveSuccess()
+    setLoading(true)
+
+    const {name, expectedSavingPercentage, color} = values
+
+    firebase.setMainIncomeSource(name, expectedSavingPercentage, color)
+      .then(() => {
+        onSaveSuccess()
+      })
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => {
@@ -42,6 +52,7 @@ const AddMainSourceForm = ({onSaveSuccess}) => {
         setPickerColors(colors)
         setValues({
           name: '',
+          expectedSavingPercentage: '20',
           color: colors[0]
         })
       })
@@ -63,10 +74,14 @@ const AddMainSourceForm = ({onSaveSuccess}) => {
           />
         </div>
       </DialogContent>
+
       <DialogActions>
-        <Button color="primary" autoFocus onClick={handleSave}>
-          Сохранить
-        </Button>
+        <div className={classes.saveBtnWrapper}>
+          <Button variant="contained" color="primary" disabled={loading} onClick={handleSave}>
+            Сохранить
+          </Button>
+          {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+        </div>
       </DialogActions>
     </>
   )

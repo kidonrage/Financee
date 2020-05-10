@@ -66,6 +66,19 @@ class Firebase {
     })
   }
 
+  setMainIncomeSource(name, expectedSavingPercentage, color) {
+    const {uid} = this.auth.currentUser
+    
+    const userDataRef = this.db.doc(`${uid}/userData`)
+    return userDataRef.set({
+      mainSource: {
+        name, 
+        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
+        color
+      }
+    }, {merge: true})
+  }
+
   addIncomeSource(name, expectedSavingPercentage, color) {
     const {uid} = this.auth.currentUser
     
@@ -119,7 +132,7 @@ class Firebase {
     return this.db.doc(`${uid}/userData`).get()
       .then(doc => {
         if (!doc.exists) {
-          throw new Error("Нет юзера еще")
+          return {}
         }
 
         return doc.data()
