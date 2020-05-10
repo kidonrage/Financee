@@ -25,9 +25,6 @@ const UserDataProvider = ({children}) => {
 
         setCurrentUserData(data)
       })
-      .catch((error) => {
-        console.log(error)
-      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -62,7 +59,7 @@ const UserDataProvider = ({children}) => {
       value={{
         userData,
         incomeSources,
-        reloadUserData: () => reload()
+        reloadUserData: reload
       }}
     >
       {!isInitialSetupNeeded && userData && (

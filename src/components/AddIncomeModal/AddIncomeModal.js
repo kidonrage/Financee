@@ -126,12 +126,14 @@ const AddIncomeModal = ({open, handleClose}) => {
               >
                 {incomeSources.map((source, idx) => <MenuItem key={idx} value={source.id}>{source.name}</MenuItem>)}
               </Select>
-              <FormHelperText 
-                className={classes.addIncomeSource}
-                onClick={() => setIncomeSourceModalOpen(true)}
-              >
-                Добавить источник дохода
-              </FormHelperText>
+              {incomeSources.length < 5 && (
+                <FormHelperText 
+                  className={classes.addIncomeSource}
+                  onClick={() => setIncomeSourceModalOpen(true)}
+                >
+                  Добавить источник дохода
+                </FormHelperText>
+              )}
             </FormControl>
           </DialogContent>
 
@@ -151,10 +153,11 @@ const AddIncomeModal = ({open, handleClose}) => {
         open={incomeSourceModalOpen}
         handleClose={() => setIncomeSourceModalOpen(false)}
         onAdd={(newIncomeSource) => {
+          console.log(newIncomeSource)
           reloadUserData();
           setValues({
             ...values,
-            incomeSource: newIncomeSource.id
+            sourceId: newIncomeSource.id
           })
         }}
       />

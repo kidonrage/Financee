@@ -47,7 +47,7 @@ const AddIncomeSourceModal = ({open, handleClose, onAdd}) => {
     const {name, expectedSavingPercentage, color} = values
 
     firebase.addIncomeSource(name, expectedSavingPercentage, color)
-      .then((data) => {
+      .then(({data}) => {
         onAdd(data)
         handleClose()
       })
