@@ -5,7 +5,7 @@ import { FirebaseProvider } from './utils/firebase'
 
 const alertOptions = {
   position: positions.BOTTOM_CENTER,
-  timeout: 50000,
+  timeout: 4000,
   containerStyle: {
     zIndex: 10000,
     width: 'auto',
