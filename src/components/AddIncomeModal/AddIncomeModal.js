@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import NumberFormat from 'react-number-format'
 import {
   Button,
@@ -21,6 +21,7 @@ import firebase from '../../utils/firebase'
 import styles from './styles'
 import AmountFormat from '../AmountFormat'
 import AddIncomeSourceModal from '../AddIncomeSourceModal'
+import { UserDataContext } from '../UserDataProvider'
 
 const useStyles = makeStyles(styles)
 
@@ -30,12 +31,13 @@ const AddIncomeModal = ({open, handleClose}) => {
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [incomeSourceModalOpen, setIncomeSourceModalOpen] = useState(false)
-  const [incomeSources, setIncomeSources] = useState([])
   const [values, setValues] = useState({
-    incomeSource: '',
+    sourceId: '',
     incomeAmount: '0',
     goalSaving: '0'
   })
+
+  const {incomeSources, reload} = useContext(UserDataContext)
 
   const handleChange = (event) => {
     setValues({
@@ -44,17 +46,14 @@ const AddIncomeModal = ({open, handleClose}) => {
     })
   }
 
-  useEffect(() => {
-    firebase.getIncomeSources()
-      .then(setIncomeSources)
-  }, [])
-
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    const {incomeAmount, goalSaving, incomeSource} = values
+    const {incomeAmount, goalSaving, sourceId} = values
+
+    let incomeSource = incomeSources.find(source => source.id === sourceId)
     
-    firebase.addIncome(incomeAmount, goalSaving, JSON.parse(incomeSource))
+    firebase.addIncome(incomeAmount, goalSaving, incomeSource)
       .then(() => {
         alert("Доход добавлен успешно!")
         handleOpenModal()
@@ -63,7 +62,7 @@ const AddIncomeModal = ({open, handleClose}) => {
 
   const handleOpenModal = useCallback(() => {
     setValues({
-      incomeSource: '',
+      sourceId: '',
       incomeAmount: '0',
       goalSaving: '0'
     })
@@ -118,14 +117,14 @@ const AddIncomeModal = ({open, handleClose}) => {
               <Select 
                 className={classes.incomeSource}
                 labelId="incomeSourceLabel" 
-                id="incomeSource" 
-                name="incomeSource"
-                value={values.incomeSource}
+                id="sourceId" 
+                name="sourceId"
+                value={values.sourceId}
                 onChange={handleChange}
                 label={incomeSources.length ? "Источник дохода" : "Нет источников дохода"}
                 disabled={!incomeSources.length}
               >
-                {incomeSources.map((source, idx) => <MenuItem key={idx} value={JSON.stringify(source)}>{source.name}</MenuItem>)}
+                {incomeSources.map((source, idx) => <MenuItem key={idx} value={source.id}>{source.name}</MenuItem>)}
               </Select>
               <FormHelperText 
                 className={classes.addIncomeSource}
@@ -152,10 +151,6 @@ const AddIncomeModal = ({open, handleClose}) => {
         open={incomeSourceModalOpen}
         handleClose={() => setIncomeSourceModalOpen(false)}
         onAdd={(newIncomeSource) => {
-          setIncomeSources([
-            ...incomeSources,
-            newIncomeSource
-          ])
           setValues({
             ...values,
             incomeSource: JSON.stringify(newIncomeSource)
