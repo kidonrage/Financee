@@ -8,6 +8,7 @@ export const UserDataContext = React.createContext()
 const UserDataProvider = ({children}) => {
   const [isInitialSetupNeeded, setIsInitialSetupNeeded] = useState(false)
   const [userData, setCurrentUserData] = useState(null)
+  const [incomeSources, setIncomeSources] = useState([])
 
   const { setLoading } = useContext(LoadingContext)
 
@@ -34,6 +35,24 @@ const UserDataProvider = ({children}) => {
     reload()
   }, [reload])
 
+  useEffect(() => {
+    if (!userData) {
+      return
+    }
+
+    let userIncomeSources = []
+
+    if (userData.mainSource) {
+      userIncomeSources.push(userData.mainSource)
+    }
+
+    if (userData.extraSources) {
+      userIncomeSources.push(...userData.extraSources)
+    }
+
+    setIncomeSources(userIncomeSources)
+  }, [userData])
+
   if (!userData) {
     return <></>
   }
@@ -42,13 +61,14 @@ const UserDataProvider = ({children}) => {
     <UserDataContext.Provider
       value={{
         userData,
+        incomeSources,
         reloadUserData: () => reload()
       }}
     >
-      {isInitialSetupNeeded 
-        ? (<InitialSetupModal open={isInitialSetupNeeded} />) 
-        : (children)
-      }
+      {!isInitialSetupNeeded && userData && (
+        children
+      )}
+      <InitialSetupModal open={isInitialSetupNeeded} />
     </UserDataContext.Provider>
   )
 }

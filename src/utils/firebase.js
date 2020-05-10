@@ -48,12 +48,6 @@ class Firebase {
       { merge: true }
     )
     .then(() => {
-      const addMessage = this.functions.httpsCallable('setUserCurrency');
-      return addMessage({ 
-        currency: currency.label 
-      })
-    })
-    .then(() => {
       alert("Всё добавлено!")
     })
     .catch(error => {
@@ -67,29 +61,23 @@ class Firebase {
   }
 
   setMainIncomeSource(name, expectedSavingPercentage, color) {
-    const {uid} = this.auth.currentUser
-    
-    const userDataRef = this.db.doc(`${uid}/userData`)
-    return userDataRef.set({
-      mainSource: {
-        name, 
-        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
-        color
-      }
-    }, {merge: true})
+    const setMainSource = this.functions.httpsCallable('setMainSource');
+    return setMainSource({ 
+      name, 
+      expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
+      color, 
+    })
+    .catch(e => console.error(JSON.stringify(e)))
   }
 
   addIncomeSource(name, expectedSavingPercentage, color) {
-    const {uid} = this.auth.currentUser
-    
-    const userIncomeSourcesRef = this.db.doc(`${uid}/incomeSources`)
-    return userIncomeSourcesRef.set({
-      sources: firebase.firestore.FieldValue.arrayUnion({
-        name,
-        color,
-        expectedSavingPercentage: parseInt(expectedSavingPercentage, 10)
-      })
-    }, {merge: true})
+    const addExtraSource = this.functions.httpsCallable('addExtraSource');
+    return addExtraSource({ 
+      name, 
+      expectedSavingPercentage: parseInt(expectedSavingPercentage, 10), 
+      color, 
+    })
+    .catch(e => console.error(JSON.stringify(e)))
   }
 
   getIncomeSources() {

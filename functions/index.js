@@ -70,15 +70,13 @@ exports.addUserIncome = functions.https.onCall((data, context) => {
 
   const uid = context.auth.uid;
 
-  
 })
 
-exports.setUserCurrency = functions.https.onCall((data, context) => {
-  const currency = data.currency;
+exports.setMainSource = functions.https.onCall((data, context) => {
+  const {name, expectedSavingPercentage, color} = data;
 
-  if (!currency || currency.length !== 1) {
-    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with ' +
-      'one arguments "text" containing the message text to add.');
+  if (typeof name !== 'string' || !name.length || typeof expectedSavingPercentage !== 'number' || typeof color !== 'string') {
+    throw new functions.https.HttpsError('invalid-argument', 'Не те аргументы.');
   }
 
   if (!context.auth) {
@@ -88,10 +86,53 @@ exports.setUserCurrency = functions.https.onCall((data, context) => {
 
   const uid = context.auth.uid;
 
-  admin.auth().setCustomUserClaims(uid, {
-    isGoalSet: true,
-    currency
-  })
+  return store.doc(uid + '/userData').set(
+    {
+      mainSource: {
+        name, 
+        expectedSavingPercentage,
+        color,
+        id: 'main'
+      }
+    },
+    { merge: true }
+  )
+});
+
+exports.addExtraSource = functions.https.onCall((data, context) => {
+  const {name, expectedSavingPercentage, color} = data;
+
+  if (typeof name !== 'string' || !name.length || typeof expectedSavingPercentage !== 'number' || typeof color !== 'string') {
+    throw new functions.https.HttpsError('invalid-argument', 'Не те аргументы.');
+  }
+
+  if (!context.auth) {
+    throw new functions.https.HttpsError('failed-precondition', 'The function must be called ' +
+        'while authenticated.');
+  }
+
+  const uid = context.auth.uid;
+
+  const userDataRef = store.doc(uid + '/userData')
+  userDataRef.get()
+    .then(userData => {
+      const {extraSources} = userData
+      if (extraSources && extraSources.length >= 4) {
+        throw new functions.https.HttpsError('too-much-incomes', 'Нельзя создать так много источников дохода');
+      }
+
+      return userDataRef.set({
+        extraSources: firebase.firestore.FieldValue.arrayUnion({
+          name,
+          color,
+          expectedSavingPercentage: parseInt(expectedSavingPercentage, 10),
+          id: `extra${extraSources.length}`
+        })
+      }, {merge: true})
+    })
+    .catch(() => {
+      return null
+    })
 });
 
 exports.initUserData = functions.auth.user().onCreate((user) => {

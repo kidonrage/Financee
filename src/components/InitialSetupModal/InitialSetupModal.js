@@ -36,16 +36,18 @@ const InitialSetupModal = ({open, handleClose}) => {
   const [completed, setCompleted] = React.useState({});
 
   useEffect(() => {
-    if (!userData || !userData.goal || !userData.currency) {
+    if (!userData) {
       return;
+    }
+
+    if (!userData.goal || !userData.currency) {
+      setActiveStep(0)
     }
 
     if (!userData.mainSource) {
       setActiveStep(1)
       return
     }
-
-    setActiveStep(2)
   }, [userData])
 
   useEffect(() => {
@@ -53,26 +55,11 @@ const InitialSetupModal = ({open, handleClose}) => {
       return
     }
 
-    if (userData && userData.goal && userData.currency) {
-      setCompleted(completed => ({
-        ...completed,
-        0: true
-      }))
-    }
-
-    if (userData.mainSource) {
-      setCompleted(completed => ({
-        ...completed,
-        1: true
-      }))
-    }
-
-    if (userData.extraSources && userData.extraSources.length) {
-      setCompleted(completed => ({
-        ...completed,
-        2: true
-      }))
-    }
+    setCompleted(completed => ({
+      ...completed,
+      0: userData && userData.goal && userData.currency,
+      1: userData.mainSource
+    }))
   }, [userData])
 
   const steps = getSteps()
