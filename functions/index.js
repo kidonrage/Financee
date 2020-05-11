@@ -4,6 +4,7 @@ const firebaseHelper = require('firebase-functions-helper')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const moment = require('moment')
 
 admin.initializeApp();
 
@@ -57,20 +58,66 @@ exports.onIncomeCreates = functions.firestore.document('{userId}/incomes/items/{
     }
   })
 
-exports.addUserIncome = functions.https.onCall((data, context) => {
-  const { amount, goalSaving, source } = data
+// exports.addUserIncome = functions.https.onCall((data, context) => {
+//   const { amount, goalSaving, source } = data
 
-  if (typeof amount !== 'number' || typeof goalSaving !== 'number' || !source) {
-    throw new functions.https.HttpsError('invalid-argument', 'Отправлены невалидные данные.');
+//   if (typeof amount !== 'number' || typeof goalSaving !== 'number' || !source) {
+//     throw new functions.https.HttpsError('invalid-argument', 'Отправлены невалидные данные.');
+//   }
+
+//   if (amount < goalSaving) {
+//     throw new functions.https.HttpsError('invalid-argument', 'Размер дохода не может быть меньше инвестиции в цель');
+//   }
+
+//   const uid = context.auth.uid;
+
+// })
+
+exports.setGoal = functions.https.onCall(async (data, context) => {
+  const {goal, currency} = data;
+
+  if (typeof goal !== 'number' || !goal || !currency || typeof currency.label !== 'string' || currency.label.length !== 1 || typeof currency.value !== 'string') {
+    throw new functions.https.HttpsError('invalid-argument', 'Не те аргументы.');
   }
 
-  if (amount < goalSaving) {
-    throw new functions.https.HttpsError('invalid-argument', 'Размер дохода не может быть меньше инвестиции в цель');
+  if (!context.auth) {
+    throw new functions.https.HttpsError('failed-precondition', 'The function must be called ' +
+        'while authenticated.');
   }
 
   const uid = context.auth.uid;
 
-})
+  const months = [];
+
+  let tempMonth = moment().utc();
+  for (let index = 0; index < 12; index++) {
+    const monthObject = {}
+    monthObject.startDate = tempMonth.format()
+
+    tempMonth = tempMonth.add(1, 'month');
+
+    monthObject.endDate = tempMonth.format()
+
+    months.push(monthObject)
+  }
+
+  try {
+    await store.doc(uid + '/userData').set({ 
+      goal,
+      currency,
+      goalEndDate: tempMonth.format(),
+      nextPlanning: months[0].startDate
+    }, { merge: true })
+
+    await store.doc(uid + '/planningData').set({ 
+      monthsData: months
+    })
+
+    return null
+  } catch (error) {
+    throw new functions.https.HttpsError(error.code, error.message)
+  }
+});
 
 exports.setMainSource = functions.https.onCall((data, context) => {
   const {name, expectedSavingPercentage, color} = data;

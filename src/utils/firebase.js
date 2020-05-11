@@ -18,7 +18,8 @@ const config = {
 const errors = {
   common: {
     'permission-denied': 'Нет доступа',
-    'invalid-argument': 'Были отправлены невалидные данные'
+    'invalid-argument': 'Были отправлены невалидные данные',
+    'internal': 'Произошла внутренняя ошибка'
   },
   incomeSource: {
     'out-of-range': 'Нельзя создать больше 4-х доп. источников дохода'
@@ -40,7 +41,7 @@ class Firebase {
     if (!this.alert) {
       return
     }
-
+    
     let errorMessage = ''
 
     if (errorSubject && errors[errorSubject] && errors[errorSubject][error.code]) {
@@ -69,20 +70,28 @@ class Firebase {
   }
 
   setUserGoal(goal, currency) {
-    const {uid} = this.auth.currentUser
-
-    const userDataRef = this.db.doc(`${uid}/userData`)
-    return userDataRef.set(
-      { 
+    const setMainSource = this.functions.httpsCallable('setGoal');
+    return new Promise((resolve) => {
+      setMainSource({ 
         goal: parseInt(goal, 10),
         currency
-      },
-      { merge: true }
-    )
-    .then(() => {
-      alert("Всё добавлено!")
+      })
+      .then(resolve)
+      .catch(this.catchError)
     })
-    .catch(this.catchError)
+    // const {uid} = this.auth.currentUser
+
+    // const userDataRef = this.db.doc(`${uid}/userData`)
+    // return userDataRef.set(
+    //   { 
+        
+    //   },
+    //   { merge: true }
+    // )
+    // .then(() => {
+    //   alert("Всё добавлено!")
+    // })
+    // .catch(this.catchError)
   }
 
   setMainIncomeSource(name, expectedSavingPercentage, color) {
@@ -157,6 +166,22 @@ class Firebase {
       .then(doc => {
         if (!doc.exists) {
           resolve({})
+        }
+
+        resolve(doc.data())
+      })
+      .catch(this.catchError)
+    })
+  }
+
+  getPlanningData() {
+    const {uid} = this.auth.currentUser
+
+    return new Promise((resolve) => {
+      this.db.doc(`${uid}/planningData`).get()
+      .then(doc => {
+        if (!doc.exists) {
+          resolve(null)
         }
 
         resolve(doc.data())
