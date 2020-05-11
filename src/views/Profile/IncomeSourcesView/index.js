@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useContext} from 'react'
 import { withStyles, makeStyles } from '@material-ui/core/styles'
 import { getContrastingColor } from 'react-color/lib/helpers'
 import {
@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core'
 import firebase from '../../../utils/firebase'
 import AddIncomeSourceModal from '../../../components/AddIncomeSourceModal'
+import { UserDataContext } from '../../../components/UserDataProvider'
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -42,24 +43,22 @@ const useStyles = makeStyles(theme => ({
 const IncomeSourcesView = () => {
   const classes = useStyles()
 
-  const [incomeSources, setIncomeSources] = useState([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
-  useEffect(() => {
-    firebase.getIncomeSources()
-      .then(setIncomeSources)
-  }, [])
+  const {incomeSources, reloadUserData} = useContext(UserDataContext) 
 
   return (
     <>
-      <Button 
-        className={classes.addBtn} 
-        variant="contained" 
-        color="primary" 
-        onClick={() => setIsAddModalOpen(true)}
-      >
-        Добавить новый
-      </Button>
+      {incomeSources.length < 5 && (
+        <Button 
+          className={classes.addBtn} 
+          variant="contained" 
+          color="primary" 
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          Добавить новый
+        </Button>
+      )}
 
       <TableContainer component={Paper}>
         <Table aria-label="customized table">
@@ -92,12 +91,7 @@ const IncomeSourcesView = () => {
       <AddIncomeSourceModal 
         open={isAddModalOpen}
         handleClose={() => setIsAddModalOpen(false)}
-        onAdd={(newIncomeSource) => {
-          setIncomeSources(incomeSources => ([
-            newIncomeSource,
-            ...incomeSources,
-          ]))
-        }}
+        onAdd={() => reloadUserData()}
       />
 
     </>

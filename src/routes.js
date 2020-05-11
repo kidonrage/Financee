@@ -39,6 +39,11 @@ export default [
         component: lazy(() => import('./views/Income'))
       },
       {
+        path: '/planning',
+        exact: true,
+        component: lazy(() => import('./views/Planning'))
+      },
+      {
         path: '/profile',
         exact: true,
         component: lazy(() => import('./views/Profile'))
